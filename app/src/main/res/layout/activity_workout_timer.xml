@@ -9,6 +9,15 @@
     tools:context=".WorkoutTimer"
     android:background="#ff000000">
 
+    <view
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        class="dudeofawesome.sevenminutes.DrawWorkoutTimer"
+        android:id="@+id/WorkoutTimerView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true" />
+
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
@@ -18,12 +27,12 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
-    <view
+    <Button
+        style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        class="dudeofawesome.sevenminutes.DrawWorkoutTimer"
-        android:id="@+id/WorkoutTimerView"
-        android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:text="@string/btnCalibrate"
+        android:id="@+id/btnCalibrate"
+        android:layout_below="@+id/btnStart"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

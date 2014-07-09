@@ -22,7 +22,7 @@ import java.util.LinkedList;
 
 public class WorkoutTimer extends Activity implements OnClickListener, SensorEventListener {
     //constants
-    public static final double VERSION = 0.44;
+    public static final String VERSION = "1.0";
 
     public static final int EXPLOSION = 0;
     public static final int SMOKE = 1;
@@ -39,7 +39,7 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
 
     private static int FREQUENCYOFNEWCHARS = 30;
     private static final int FRAME_RATE = 1000/30;
-    private final static int MARGINFORERROR = 3;
+    private final static int MARGINFORERROR = 10;
     public static int screenWidth, screenHeight;
 
     public static LinkedList<character> characters = new LinkedList<character>();
@@ -59,7 +59,9 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
     public static int shieldLife = 400;
     public static int shieldAlive = 0;
 
-    private static float[] accelerometerData;
+    private static float[] accelerometerData = {0f,0f};
+    private static float[] accelerometerZeroes = {0f,0f};
+    private static boolean setAccelZeroes = false;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 
@@ -88,6 +90,7 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
         ((Button)findViewById(R.id.btnStart)).setOnClickListener(this);
+        ((Button)findViewById(R.id.btnCalibrate)).setOnClickListener(this);
     }
 
     protected void onResume() {
@@ -97,6 +100,9 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
     protected void onPause() {
         super.onPause();
         mSensorManager.unregisterListener(this);
+        gamePaused = true;
+        findViewById(R.id.btnStart).setVisibility(View.VISIBLE);
+        findViewById(R.id.btnCalibrate).setVisibility(View.VISIBLE);
     }
 
     synchronized public void startGame() {
@@ -105,16 +111,29 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
         //them from inadvertently stacking up.
 
         findViewById(R.id.btnStart).setVisibility(View.GONE);
+        findViewById(R.id.btnCalibrate).setVisibility(View.GONE);
 
         characters.clear();
         bullets.clear();
         particles.clear();
         powerups.clear();
 
+        characters.clear();
         characters.add(new character(350,350,15,7,Color.CYAN));
-
+        bullets.clear();
+        particles.clear();
+        powerups.clear();
         gameOver = false;
         gamePaused = false;
+        totalScore = 0;
+        addNewCharacterCounter = FREQUENCYOFNEWCHARS;
+        smokeCounter = 0;
+        twoshotLife = 200;
+        twoshotAlive = 0;
+        shotgunLife = 200;
+        shotgunAlive = 0;
+        shieldLife = 400;
+        shieldAlive = 0;
 
         frame.removeCallbacks(frameUpdate);
         frame.postDelayed(frameUpdate, FRAME_RATE);
@@ -122,7 +141,18 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
 
     @Override
     synchronized public void onClick(View v) {
-        startGame();
+        if (v.getId() == R.id.btnStart) {
+            if (gameOver)
+                startGame();
+            else if (gamePaused) {
+                gamePaused = false;
+                findViewById(R.id.btnStart).setVisibility(View.INVISIBLE);
+                findViewById(R.id.btnCalibrate).setVisibility(View.INVISIBLE);
+            }
+        }
+        else if (v.getId() == R.id.btnCalibrate) {
+            setAccelZeroes = true;
+        }
     }
 
     @Override
@@ -230,7 +260,7 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
     public void testCollision(){
         //test for enemies touching you
         for(int i = 1;i < characters.size();i++){
-            if(circleCircleCollision(characters.get(0).x,characters.get(0).y,characters.get(0).diameter,characters.get(i).x,characters.get(i).y,characters.get(i).diameter,0)){
+            if(circleCircleCollision(characters.get(0).x,characters.get(0).y,characters.get(0).diameter,characters.get(i).x,characters.get(i).y,characters.get(i).diameter,-1)){
                 boolean shieldActive = false;
                 for(int j = 0;j < characters.get(0).collectedPowerups.size();j++){
                     if(characters.get(0).collectedPowerups.get(j) == SHIELD){
@@ -258,6 +288,7 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
                         gameOver = true;
 
                         findViewById(R.id.btnStart).setVisibility(View.VISIBLE);
+                        findViewById(R.id.btnCalibrate).setVisibility(View.VISIBLE);
 
                         numOfParts = (int) (Math.random() * 50 + 300);
                         for(int k = 0; k < numOfParts;k++){
@@ -649,12 +680,36 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-//        System.out.println(event.values[0]+","+event.values[1]+","+event.values[2]);
-        accelerometerData = event.values;
+        accelerometerData[0] = event.values[0] - accelerometerZeroes[0];
+        accelerometerData[1] = event.values[1] - accelerometerZeroes[1];
+        if (setAccelZeroes) {
+            accelerometerZeroes[0] = event.values[0];
+            accelerometerZeroes[1] = event.values[1];
+            setAccelZeroes = false;
+        }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!gamePaused) {
+            gamePaused = true;
+            findViewById(R.id.btnStart).setVisibility(View.VISIBLE);
+            findViewById(R.id.btnCalibrate).setVisibility(View.VISIBLE);
+        }
+        else if (gamePaused) {
+            gamePaused = false;
+            findViewById(R.id.btnStart).setVisibility(View.INVISIBLE);
+            findViewById(R.id.btnCalibrate).setVisibility(View.INVISIBLE);
+        }
+        else if (gameOver) {
+            startGame();
+            findViewById(R.id.btnStart).setVisibility(View.INVISIBLE);
+            findViewById(R.id.btnCalibrate).setVisibility(View.INVISIBLE);
+        }
     }
 }

@@ -110,6 +110,7 @@ public class DrawWorkoutTimer extends View {
          //draw score
          paint.setColor(Color.GRAY);
 //         paint.setFont(new Font("Arial", Font.BOLD, 30));
+         paint.setTextSize(30);
          canvas.drawText(WorkoutTimer.totalScore + "",getWidth() - 200,getHeight() - 50,paint);
 
          if(WorkoutTimer.gamePaused == false && WorkoutTimer.gameOver == false){
@@ -119,21 +120,25 @@ public class DrawWorkoutTimer extends View {
              paint.setColor(Color.WHITE);
              paint.setStrokeWidth(5);
 //             paint.setFont(new Font("Arial", Font.BOLD, 40));
+             paint.setTextSize(40);
              canvas.drawText("Game Paused",80,150,paint);
 //             paint.setFont(new Font("Arial", Font.BOLD, 20));
+             paint.setTextSize(20);
              canvas.drawText("Version: " + WorkoutTimer.VERSION,80,190,paint);
          }
          else{
              //draw game over message if game over
              paint.setColor(Color.RED);
              paint.setStrokeWidth(5);
+             paint.setTextSize(40);
 //             paint.setFont(new Font("Arial", Font.BOLD, 40));
              canvas.drawText("Game Over",80,150,paint);
 //             paint.setFont(new Font("Arial", Font.BOLD, 20));
+             paint.setTextSize(20);
              canvas.drawText("Version: " + WorkoutTimer.VERSION,80,190,paint);
              paint.setColor(Color.argb(200,200,0,0));
 //             paint.setFont(new Font("Arial", Font.BOLD, 30));
-             canvas.drawText("Click to Retry",getWidth() / 2 - 85,getHeight() / 2 - 10,paint);
+//             canvas.drawText("Click to Retry",getWidth() / 2 - 85,getHeight() / 2 - 10,paint);
 
              if(WorkoutTimer.particles.size() == 0){
 

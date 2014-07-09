@@ -42,7 +42,7 @@ public class particle{
 
 			dir = Math.random() * 2.0 * Math.PI;
 			vel = Math.random() * 3 + .3;
-			diameter = (int) (Math.random() * 5 + 3);
+			diameter = (int) (Math.random() * 5 + 5);
 			lineWidth = diameter;
 			opacity = (int) (Math.random() * 100 + 140);
 		}
@@ -133,7 +133,7 @@ public class particle{
 
 			dir = Math.random() * 2.0 * Math.PI;
 			vel = Math.random() * 5 + _vel;
-			diameter = (int) (Math.random() * 5 + 3);
+			diameter = (int) (Math.random() * 5 + 5);
 			lineWidth = diameter;
 			opacity = (int) (Math.random() * 100 + 140);
 		}
