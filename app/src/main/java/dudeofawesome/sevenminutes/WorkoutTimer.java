@@ -17,6 +17,7 @@ import android.graphics.Color;
 import android.view.Display;
 import android.graphics.Point;
 import android.view.WindowManager;
+import com.google.android.gms.ads.*;
 
 import java.util.LinkedList;
 
@@ -91,6 +92,11 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
 
         ((Button)findViewById(R.id.btnStart)).setOnClickListener(this);
         ((Button)findViewById(R.id.btnCalibrate)).setOnClickListener(this);
+
+        // Look up the AdView as a resource and load a request.
+        AdView adView = (AdView)this.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
     }
 
     protected void onResume() {
@@ -101,8 +107,19 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
         super.onPause();
         mSensorManager.unregisterListener(this);
         gamePaused = true;
+        showInterface();
+    }
+
+    private void showInterface() {
         findViewById(R.id.btnStart).setVisibility(View.VISIBLE);
         findViewById(R.id.btnCalibrate).setVisibility(View.VISIBLE);
+        findViewById(R.id.adView).setVisibility(View.VISIBLE);
+    }
+
+    private void hideInterface() {
+        findViewById(R.id.btnStart).setVisibility(View.INVISIBLE);
+        findViewById(R.id.btnCalibrate).setVisibility(View.INVISIBLE);
+        findViewById(R.id.adView).setVisibility(View.INVISIBLE);
     }
 
     synchronized public void startGame() {
@@ -110,8 +127,7 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
         //It's a good idea to remove any existing callbacks to keep
         //them from inadvertently stacking up.
 
-        findViewById(R.id.btnStart).setVisibility(View.GONE);
-        findViewById(R.id.btnCalibrate).setVisibility(View.GONE);
+        hideInterface();
 
         characters.clear();
         bullets.clear();
@@ -146,8 +162,7 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
                 startGame();
             else if (gamePaused) {
                 gamePaused = false;
-                findViewById(R.id.btnStart).setVisibility(View.INVISIBLE);
-                findViewById(R.id.btnCalibrate).setVisibility(View.INVISIBLE);
+                hideInterface();
             }
         }
         else if (v.getId() == R.id.btnCalibrate) {
@@ -155,7 +170,7 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
         }
     }
 
-    @Override
+   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.workout_timer, menu);
@@ -287,8 +302,7 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
                         //game over
                         gameOver = true;
 
-                        findViewById(R.id.btnStart).setVisibility(View.VISIBLE);
-                        findViewById(R.id.btnCalibrate).setVisibility(View.VISIBLE);
+                        showInterface();
 
                         numOfParts = (int) (Math.random() * 50 + 300);
                         for(int k = 0; k < numOfParts;k++){
@@ -698,18 +712,15 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
     public void onBackPressed() {
         if (!gamePaused) {
             gamePaused = true;
-            findViewById(R.id.btnStart).setVisibility(View.VISIBLE);
-            findViewById(R.id.btnCalibrate).setVisibility(View.VISIBLE);
+            showInterface();
         }
         else if (gamePaused) {
             gamePaused = false;
-            findViewById(R.id.btnStart).setVisibility(View.INVISIBLE);
-            findViewById(R.id.btnCalibrate).setVisibility(View.INVISIBLE);
+            hideInterface();
         }
         else if (gameOver) {
             startGame();
-            findViewById(R.id.btnStart).setVisibility(View.INVISIBLE);
-            findViewById(R.id.btnCalibrate).setVisibility(View.INVISIBLE);
+            hideInterface();
         }
     }
 }

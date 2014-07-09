@@ -36,22 +36,17 @@ public class DrawWorkoutTimer extends View {
         paint = new Paint();
         paint.setColor(Color.RED);
         paint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        //paint.setTextAlign(Paint.Align.LEFT);
         paint.setStrokeWidth(5);
 
      }
 
-    int i = 0;
-    boolean fill = true;
-
-     @Override
+    @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
 
          //draw particles
          for(int i = 0; i < WorkoutTimer.particles.size(); i++){
-             //String _color = particles.get(i).color + "," + particles.get(i).opacity;
              paint.setColor(WorkoutTimer.particles.get(i).color);
              paint.setAlpha(WorkoutTimer.particles.get(i).opacity);
              paint.setStrokeWidth(WorkoutTimer.particles.get(i).lineWidth);
@@ -60,21 +55,18 @@ public class DrawWorkoutTimer extends View {
          //draw player
          paint.setColor(WorkoutTimer.characters.get(0).color);
          paint.setAlpha(255);
-//         paint.setStrokeWidth(3);
          canvas.drawCircle(WorkoutTimer.characters.get(0).x,WorkoutTimer.characters.get(0).y,WorkoutTimer.characters.get(0).diameter/2,paint);
 
          //draw zombies
          for(int i = 1;i < WorkoutTimer.characters.size(); i++){
              paint.setColor(WorkoutTimer.characters.get(i).color);
              paint.setStrokeWidth(3);
-//             canvas.drawArc(new RectF(WorkoutTimer.characters.get(i).x,WorkoutTimer.characters.get(i).y,WorkoutTimer.characters.get(i).diameter,WorkoutTimer.characters.get(i).diameter),0,360,true,paint);
              canvas.drawCircle(WorkoutTimer.characters.get(i).x,WorkoutTimer.characters.get(i).y,WorkoutTimer.characters.get(i).diameter/2,paint);
          }
          //draw bullets
          for(int i = 0;i < WorkoutTimer.bullets.size(); i++){
              paint.setColor(WorkoutTimer.bullets.get(i).color);
              paint.setStrokeWidth(3);
-//             canvas.drawArc(new RectF(WorkoutTimer.bullets.get(i).x,WorkoutTimer.bullets.get(i).y,WorkoutTimer.bullets.get(i).diameter,WorkoutTimer.bullets.get(i).diameter),0,360,true,paint);
              canvas.drawCircle(WorkoutTimer.bullets.get(i).x,WorkoutTimer.bullets.get(i).y,WorkoutTimer.bullets.get(i).diameter/2,paint);
          }
          //draw laser
@@ -109,7 +101,6 @@ public class DrawWorkoutTimer extends View {
 
          //draw score
          paint.setColor(Color.GRAY);
-//         paint.setFont(new Font("Arial", Font.BOLD, 30));
          paint.setTextSize(30);
          canvas.drawText(WorkoutTimer.totalScore + "",getWidth() - 200,getHeight() - 50,paint);
 
@@ -119,10 +110,8 @@ public class DrawWorkoutTimer extends View {
          else if(WorkoutTimer.gamePaused == true){
              paint.setColor(Color.WHITE);
              paint.setStrokeWidth(5);
-//             paint.setFont(new Font("Arial", Font.BOLD, 40));
              paint.setTextSize(40);
              canvas.drawText("Game Paused",80,150,paint);
-//             paint.setFont(new Font("Arial", Font.BOLD, 20));
              paint.setTextSize(20);
              canvas.drawText("Version: " + WorkoutTimer.VERSION,80,190,paint);
          }
@@ -131,14 +120,10 @@ public class DrawWorkoutTimer extends View {
              paint.setColor(Color.RED);
              paint.setStrokeWidth(5);
              paint.setTextSize(40);
-//             paint.setFont(new Font("Arial", Font.BOLD, 40));
              canvas.drawText("Game Over",80,150,paint);
-//             paint.setFont(new Font("Arial", Font.BOLD, 20));
              paint.setTextSize(20);
              canvas.drawText("Version: " + WorkoutTimer.VERSION,80,190,paint);
              paint.setColor(Color.argb(200,200,0,0));
-//             paint.setFont(new Font("Arial", Font.BOLD, 30));
-//             canvas.drawText("Click to Retry",getWidth() / 2 - 85,getHeight() / 2 - 10,paint);
 
              if(WorkoutTimer.particles.size() == 0){
 
