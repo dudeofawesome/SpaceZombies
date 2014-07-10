@@ -1,4 +1,4 @@
-package dudeofawesome.sevenminutes;
+package dudeofawesome.spaceZombies;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,12 +18,14 @@ import android.view.Display;
 import android.graphics.Point;
 import android.view.WindowManager;
 import com.google.android.gms.ads.*;
-
+import com.google.android.gms.games.Games;
+import com.google.android.gms.games.Player;
+import com.google.example.games.basegameutils.BaseGameActivity;
 import java.util.LinkedList;
 
-public class WorkoutTimer extends Activity implements OnClickListener, SensorEventListener {
+public class WorkoutTimer extends BaseGameActivity implements OnClickListener, SensorEventListener {
     //constants
-    public static final String VERSION = "1.0";
+    public static final String VERSION = "1.2";
 
     public static final int EXPLOSION = 0;
     public static final int SMOKE = 1;
@@ -59,6 +61,7 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
     private static int shotgunAlive = 0;
     public static int shieldLife = 400;
     public static int shieldAlive = 0;
+    private static int zombiesKilled = 0;
 
     private static float[] accelerometerData = {0f,0f};
     private static float[] accelerometerZeroes = {0f,0f};
@@ -92,13 +95,27 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
 
         ((Button)findViewById(R.id.btnStart)).setOnClickListener(this);
         ((Button)findViewById(R.id.btnCalibrate)).setOnClickListener(this);
+        ((Button)findViewById(R.id.btnAchievements)).setOnClickListener(this);
+        ((Button)findViewById(R.id.btnLeaderboards)).setOnClickListener(this);
+        findViewById(R.id.sign_in_button).setOnClickListener(this);
+        findViewById(R.id.sign_out_button).setOnClickListener(this);
+
+        if (isSignedIn()) {
+            findViewById(R.id.sign_in_button).setVisibility(View.INVISIBLE);
+            findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
+        }
 
         // Look up the AdView as a resource and load a request.
         AdView adView = (AdView)this.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
     }
-
+    @Override
+    public void onStart(){
+        super.onStart();
+        //Here is a good place to connect with Google Api
+//        mGoogleClient.connect();
+    }
     protected void onResume() {
         super.onResume();
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
@@ -114,12 +131,20 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
         findViewById(R.id.btnStart).setVisibility(View.VISIBLE);
         findViewById(R.id.btnCalibrate).setVisibility(View.VISIBLE);
         findViewById(R.id.adView).setVisibility(View.VISIBLE);
+        findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
+        findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
+        findViewById(R.id.btnLeaderboards).setVisibility(View.VISIBLE);
+        findViewById(R.id.btnAchievements).setVisibility(View.VISIBLE);
     }
 
     private void hideInterface() {
         findViewById(R.id.btnStart).setVisibility(View.INVISIBLE);
         findViewById(R.id.btnCalibrate).setVisibility(View.INVISIBLE);
         findViewById(R.id.adView).setVisibility(View.INVISIBLE);
+        findViewById(R.id.sign_in_button).setVisibility(View.INVISIBLE);
+        findViewById(R.id.sign_out_button).setVisibility(View.INVISIBLE);
+        findViewById(R.id.btnLeaderboards).setVisibility(View.INVISIBLE);
+        findViewById(R.id.btnAchievements).setVisibility(View.INVISIBLE);
     }
 
     synchronized public void startGame() {
@@ -167,6 +192,29 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
         }
         else if (v.getId() == R.id.btnCalibrate) {
             setAccelZeroes = true;
+        }
+        else if (v.getId() == R.id.sign_in_button) {
+            // start the asynchronous sign in flow
+            findViewById(R.id.sign_in_button).setVisibility(View.INVISIBLE);
+            findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
+            beginUserInitiatedSignIn();
+        }
+        else if (v.getId() == R.id.sign_out_button) {
+            findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
+            findViewById(R.id.sign_out_button).setVisibility(View.INVISIBLE);
+            signOut();
+        }
+        else if (v.getId() == R.id.btnAchievements) {
+            if (isSignedIn())
+                startActivityForResult(Games.Achievements.getAchievementsIntent(getApiClient()), 5001);
+            else
+                showAlert("You need to sign in.");
+        }
+        else if (v.getId() == R.id.btnLeaderboards) {
+            if (isSignedIn())
+                startActivityForResult(Games.Leaderboards.getLeaderboardIntent(getApiClient(), String.valueOf(R.string.leaderboard_High_Scores)), 5001);
+            else
+                showAlert("You need to sign in.");
         }
     }
 
@@ -311,6 +359,8 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
 
                         characters.remove(0);
 
+                        awardAchievements();
+
                         //@debug
                         //new AePlayWave(getClass().getClassLoader().getResourceAsStream("/sounds/youExplode.wav").toString().split(":")[1]).start();
                     }
@@ -438,6 +488,7 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
 
                     //give 100 points for killing enemy
                     totalScore += 100;
+                    zombiesKilled++;
 
                     //add an enemy
                     if(laser.alive == 0 && twoshotAlive == 0 && shotgunAlive == 0){
@@ -489,6 +540,25 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
                 bullets.remove(i);
             }
         }
+    }
+
+    private void awardAchievements() {
+        if(zombiesKilled >= 1)
+            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Zombie_Slayer));
+        if(zombiesKilled >= 50)
+            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Better_Zombie_Slayer));
+        if(zombiesKilled >= 500)
+            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Super_Zombie_Slayer));
+        if(zombiesKilled >= 5000)
+            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Ultimate_Zombie_Slayer));
+        if(zombiesKilled >= 500000)
+            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Supreme_Overlord_Zombie_Slayer));
+        if(totalScore > 5000)
+            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_High_Scorer));
+        if(totalScore > 20000)
+            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Higher_Scorer));
+
+        Games.Leaderboards.submitScore(getApiClient(), getString(R.string.leaderboard_High_Scores), totalScore);
     }
 
     public boolean circleCircleCollision(int _x1,int _y1,int _diam1,int _x2,int _y2,int _diam2,int _marginForError){
@@ -722,5 +792,15 @@ public class WorkoutTimer extends Activity implements OnClickListener, SensorEve
             startGame();
             hideInterface();
         }
+    }
+
+    @Override
+    public void onSignInFailed() {
+
+    }
+
+    @Override
+    public void onSignInSucceeded() {
+
     }
 }

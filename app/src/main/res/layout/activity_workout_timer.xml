@@ -13,7 +13,7 @@
     <view
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        class="dudeofawesome.sevenminutes.DrawWorkoutTimer"
+        class="dudeofawesome.spaceZombies.DrawWorkoutTimer"
         android:id="@+id/WorkoutTimerView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -25,8 +25,11 @@
         android:layout_height="wrap_content"
         android:text="@string/btnStartTxt"
         android:id="@+id/btnStart"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_above="@+id/btnCalibrate"
+        android:layout_alignRight="@+id/btnCalibrate"
+        android:layout_alignEnd="@+id/btnCalibrate"
+        android:layout_alignLeft="@+id/btnCalibrate"
+        android:layout_alignStart="@+id/btnCalibrate" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
@@ -34,7 +37,48 @@
         android:layout_height="wrap_content"
         android:text="@string/btnCalibrate"
         android:id="@+id/btnCalibrate"
-        android:layout_below="@+id/btnStart"
+        android:layout_above="@+id/btnAchievements"
+        android:layout_alignLeft="@+id/btnLeaderboards"
+        android:layout_alignStart="@+id/btnLeaderboards"
+        android:layout_alignRight="@+id/btnAchievements"
+        android:layout_alignEnd="@+id/btnAchievements" />
+
+    <!-- sign-in button -->
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <!-- sign-out button -->
+    <Button
+        android:id="@+id/sign_out_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign Out"
+        android:visibility="gone"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:id="@+id/btnLeaderboards"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Leaderboards"
+        android:layout_below="@+id/btnAchievements"
+        android:layout_alignLeft="@+id/btnAchievements"
+        android:layout_alignStart="@+id/btnAchievements"
+        android:layout_alignRight="@+id/btnAchievements"
+        android:layout_alignEnd="@+id/btnAchievements" />
+
+    <Button
+        android:id="@+id/btnAchievements"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Achievements"
+        android:layout_alignWithParentIfMissing="false"
+        android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
     <com.google.android.gms.ads.AdView android:id="@+id/adView"

@@ -3,7 +3,7 @@
  * @date 10 September 2012
 */
 
-package dudeofawesome.sevenminutes;
+package dudeofawesome.spaceZombies;
 
 //import java.awt.image.BufferedImage;
 //import java.io.File;

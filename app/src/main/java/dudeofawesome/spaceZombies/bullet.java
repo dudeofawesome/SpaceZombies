@@ -3,7 +3,7 @@
  * @date 10 September 2012
 */
 
-package dudeofawesome.sevenminutes;
+package dudeofawesome.spaceZombies;
 
 import android.graphics.Color;
 

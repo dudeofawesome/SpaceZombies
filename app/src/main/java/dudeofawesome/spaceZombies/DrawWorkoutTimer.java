@@ -1,4 +1,4 @@
-package dudeofawesome.sevenminutes;
+package dudeofawesome.spaceZombies;
 
 import android.content.Context;
 import android.content.res.TypedArray;
