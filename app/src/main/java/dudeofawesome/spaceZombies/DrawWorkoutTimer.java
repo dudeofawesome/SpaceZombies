@@ -102,7 +102,7 @@ public class DrawWorkoutTimer extends View {
          //draw score
          paint.setColor(Color.GRAY);
          paint.setTextSize(30);
-         canvas.drawText(WorkoutTimer.totalScore + "",getWidth() - 200,getHeight() - 50,paint);
+         canvas.drawText(WorkoutTimer.totalScore + "",getWidth() - 200,getHeight() - 120,paint);
 
          if(WorkoutTimer.gamePaused == false && WorkoutTimer.gameOver == false){
              WorkoutTimer.shootBullet();

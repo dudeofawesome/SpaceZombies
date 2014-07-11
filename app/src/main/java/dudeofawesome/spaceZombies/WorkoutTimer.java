@@ -2,12 +2,14 @@ package dudeofawesome.spaceZombies;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -19,13 +21,17 @@ import android.graphics.Point;
 import android.view.WindowManager;
 import com.google.android.gms.ads.*;
 import com.google.android.gms.games.Games;
-import com.google.android.gms.games.Player;
 import com.google.example.games.basegameutils.BaseGameActivity;
 import java.util.LinkedList;
+import dudeofawesome.spaceZombies.util.IabHelper;
+import dudeofawesome.spaceZombies.util.IabResult;
+import dudeofawesome.spaceZombies.util.Inventory;
+import dudeofawesome.spaceZombies.util.Purchase;
+
 
 public class WorkoutTimer extends BaseGameActivity implements OnClickListener, SensorEventListener {
     //constants
-    public static final String VERSION = "1.2";
+    public static final String VERSION = "1.4";
 
     public static final int EXPLOSION = 0;
     public static final int SMOKE = 1;
@@ -74,6 +80,13 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
     private DrawWorkoutTimer drawWorkoutTimer;
     private Handler frame = new Handler();
 
+
+    private static final String TAG =
+            "dudeofawesome.spacezombies";
+    IabHelper mHelper;
+    static final String ITEM_SKU = "dudeofawesome.spacezombies.removeads";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,8 +110,25 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
         ((Button)findViewById(R.id.btnCalibrate)).setOnClickListener(this);
         ((Button)findViewById(R.id.btnAchievements)).setOnClickListener(this);
         ((Button)findViewById(R.id.btnLeaderboards)).setOnClickListener(this);
+        ((Button)findViewById(R.id.btnBuy)).setOnClickListener(this);
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         findViewById(R.id.sign_out_button).setOnClickListener(this);
+
+        String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxyDfpUx0t6ffrQAUkfEYGiM4bfRu043AW5xDpVBQbnt10jRgD0NmdsVi+Zyua8yx9m1klesxA38eCV/GScZ+S2xBFoyS1SkSnTeT5PBPnLs1/eIOABIvlKdwQAk7BgCxERFcp2Q9CEr60j3V+VoD0tp0NVj9qE39rZ8KhnM5ZXwxhaAB6aHRQoyXwuMMfMXcmlhJWo4xiPoeb8eNe7KqVQr0Fh4vSSuLdWMEcHV3RtLiUszucncQMTZ5NKCbALPepyAEsf/0T7AxYd0yYpONNX1zvJEKh1QX6VjmFwXLr9k4E+r7uynJ5v9AyUbvNTd9SxVL6P7xuaCoJnEW1o8+gwIDAQAB";
+
+        mHelper = new IabHelper(this, base64EncodedPublicKey);
+
+        mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+                               public void onIabSetupFinished(IabResult result)
+                                   {
+                                       if (!result.isSuccess()) {
+                                           Log.d(TAG, "In-app Billing setup failed: " +
+                                                   result);
+                                       } else {
+                                           Log.d(TAG, "In-app Billing is set up OK");
+                                       }
+                                   }
+                               });
 
         if (isSignedIn()) {
             findViewById(R.id.sign_in_button).setVisibility(View.INVISIBLE);
@@ -113,8 +143,6 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
     @Override
     public void onStart(){
         super.onStart();
-        //Here is a good place to connect with Google Api
-//        mGoogleClient.connect();
     }
     protected void onResume() {
         super.onResume();
@@ -128,23 +156,11 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
     }
 
     private void showInterface() {
-        findViewById(R.id.btnStart).setVisibility(View.VISIBLE);
-        findViewById(R.id.btnCalibrate).setVisibility(View.VISIBLE);
-        findViewById(R.id.adView).setVisibility(View.VISIBLE);
-        findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-        findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
-        findViewById(R.id.btnLeaderboards).setVisibility(View.VISIBLE);
-        findViewById(R.id.btnAchievements).setVisibility(View.VISIBLE);
+        findViewById(R.id.uiLayout).setVisibility(View.VISIBLE);
     }
 
     private void hideInterface() {
-        findViewById(R.id.btnStart).setVisibility(View.INVISIBLE);
-        findViewById(R.id.btnCalibrate).setVisibility(View.INVISIBLE);
-        findViewById(R.id.adView).setVisibility(View.INVISIBLE);
-        findViewById(R.id.sign_in_button).setVisibility(View.INVISIBLE);
-        findViewById(R.id.sign_out_button).setVisibility(View.INVISIBLE);
-        findViewById(R.id.btnLeaderboards).setVisibility(View.INVISIBLE);
-        findViewById(R.id.btnAchievements).setVisibility(View.INVISIBLE);
+        findViewById(R.id.uiLayout).setVisibility(View.INVISIBLE);
     }
 
     synchronized public void startGame() {
@@ -212,9 +228,44 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
         }
         else if (v.getId() == R.id.btnLeaderboards) {
             if (isSignedIn())
-                startActivityForResult(Games.Leaderboards.getLeaderboardIntent(getApiClient(), String.valueOf(R.string.leaderboard_High_Scores)), 5001);
+                startActivityForResult(Games.Leaderboards.getAllLeaderboardsIntent(getApiClient()), 5001);
+//                startActivityForResult(Games.Leaderboards.getLeaderboardIntent(getApiClient(), String.valueOf(R.string.leaderboard_High_Scores)), 5001);
             else
                 showAlert("You need to sign in.");
+        }
+        else if (v.getId() == R.id.btnBuy) {
+            IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener
+                    = new IabHelper.OnIabPurchaseFinishedListener() {
+                public void onIabPurchaseFinished(IabResult result,
+                                                  Purchase purchase)
+                {
+                    if (result.isFailure()) {
+                        // Handle error
+                        showAlert("Failed to buy");
+                        showAlert("But you can remove ads anyways :)");
+                        AdView adView = (AdView)findViewById(R.id.adView);
+                        adView.destroy();
+                        return;
+                    }
+                    else if (purchase.getSku().equals(ITEM_SKU)) {
+                        AdView adView = (AdView)findViewById(R.id.adView);
+                        adView.destroy();
+                    }
+
+                }
+            };
+
+            mHelper.launchPurchaseFlow(this, ITEM_SKU, 10001,
+                    mPurchaseFinishedListener, "dudeofawesome.spacezombies.removeads");
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data)
+    {
+        if (!mHelper.handleActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 

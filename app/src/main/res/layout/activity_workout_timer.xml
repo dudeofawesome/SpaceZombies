@@ -19,74 +19,128 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true" />
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/btnStartTxt"
-        android:id="@+id/btnStart"
-        android:layout_above="@+id/btnCalibrate"
-        android:layout_alignRight="@+id/btnCalibrate"
-        android:layout_alignEnd="@+id/btnCalibrate"
-        android:layout_alignLeft="@+id/btnCalibrate"
-        android:layout_alignStart="@+id/btnCalibrate" />
-
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/btnCalibrate"
-        android:id="@+id/btnCalibrate"
-        android:layout_above="@+id/btnAchievements"
-        android:layout_alignLeft="@+id/btnLeaderboards"
-        android:layout_alignStart="@+id/btnLeaderboards"
-        android:layout_alignRight="@+id/btnAchievements"
-        android:layout_alignEnd="@+id/btnAchievements" />
-
-    <!-- sign-in button -->
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/sign_in_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <!-- sign-out button -->
-    <Button
-        android:id="@+id/sign_out_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Sign Out"
-        android:visibility="gone"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <Button
-        android:id="@+id/btnLeaderboards"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Leaderboards"
-        android:layout_below="@+id/btnAchievements"
-        android:layout_alignLeft="@+id/btnAchievements"
-        android:layout_alignStart="@+id/btnAchievements"
-        android:layout_alignRight="@+id/btnAchievements"
-        android:layout_alignEnd="@+id/btnAchievements" />
-
-    <Button
-        android:id="@+id/btnAchievements"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Achievements"
-        android:layout_alignWithParentIfMissing="false"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
-
-    <com.google.android.gms.ads.AdView android:id="@+id/adView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <RelativeLayout
+        android:id="@+id/uiLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        ads:adUnitId="ca-app-pub-4879687351416731/7997552404"
-        ads:adSize="BANNER"/>
+        android:layout_alignParentRight="true">
+
+        <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true">
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btnStartTxt"
+                    android:id="@+id/btnStart"
+                    android:layout_above="@+id/btnCalibrate"
+                    android:layout_alignRight="@+id/btnCalibrate"
+                    android:layout_alignEnd="@+id/btnCalibrate"
+                    android:layout_alignLeft="@+id/btnCalibrate"
+                    android:layout_alignStart="@+id/btnCalibrate"
+                    style="?android:attr/buttonStyleSmall" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btnCalibrate"
+                    android:id="@+id/btnCalibrate"
+                    android:layout_above="@+id/btnAchievements"
+                    android:layout_alignLeft="@+id/btnLeaderboards"
+                    android:layout_alignStart="@+id/btnLeaderboards"
+                    android:layout_alignRight="@+id/btnAchievements"
+                    android:layout_alignEnd="@+id/btnAchievements"
+                    android:layout_column="0" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <Button
+                    android:id="@+id/btnAchievements"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Achievements"
+                    android:layout_alignWithParentIfMissing="false"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_column="0"
+                    style="?android:attr/buttonStyleSmall" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <Button
+                    android:id="@+id/btnLeaderboards"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Leaderboards"
+                    android:layout_below="@+id/btnAchievements"
+                    android:layout_alignLeft="@+id/btnAchievements"
+                    android:layout_alignStart="@+id/btnAchievements"
+                    android:layout_alignRight="@+id/btnAchievements"
+                    android:layout_alignEnd="@+id/btnAchievements"
+                    style="?android:attr/buttonStyleSmall" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Support the Dev"
+                    android:id="@+id/btnBuy" />
+            </TableRow>
+
+        </TableLayout>
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/sign_in_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <Button
+            android:id="@+id/sign_out_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign Out"
+            android:visibility="invisible"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <com.google.android.gms.ads.AdView android:id="@+id/adView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            ads:adUnitId="ca-app-pub-4879687351416731/7997552404"
+            ads:adSize="BANNER"/>
+    </RelativeLayout>
 
 </RelativeLayout>
