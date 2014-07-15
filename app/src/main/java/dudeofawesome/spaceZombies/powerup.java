@@ -5,6 +5,11 @@
 
 package dudeofawesome.spaceZombies;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 //import java.awt.image.BufferedImage;
 //import java.io.File;
 //import javax.imageio.ImageIO;
@@ -20,63 +25,35 @@ public class powerup{
 
 	public int type = LASER;
 	public int x,y,diameter = 20,life = 1000,alive;
-//	public BufferedImage sprite;
-//	powerup(int _type,int _x,int _y){
-//		type = _type;
-//		x = _x;
-//		y = _y;
-//
-//		switch(type){
-//			case LASER:
-//				try{
-//					sprite = ImageIO.read(getClass().getResource("images/laser.png"));
-//				}
-//				catch (IOException ex){
-//
-//				}
-//			break;
-//			case HEALTH:
-//				try{
-//					sprite = ImageIO.read(getClass().getResource("images/health.png"));
-//				}
-//				catch (IOException ex){
-//
-//				}
-//			break;
-//			case NUKE:
-//				try{
-//					sprite = ImageIO.read(getClass().getResource("images/nuke.png"));
-//				}
-//				catch (IOException ex){
-//
-//				}
-//			break;
-//			case TWOSHOT:
-//				try{
-//					sprite = ImageIO.read(getClass().getResource("images/twoshot.png"));
-//				}
-//				catch (IOException ex){
-//
-//				}
-//			break;
-//			case SHOTGUN:
-//				try{
-//					sprite = ImageIO.read(getClass().getResource("images/shotgun.png"));
-//				}
-//				catch (IOException ex){
-//
-//				}
-//			break;
-//			case SHIELD:
-//				try{
-//					sprite = ImageIO.read(getClass().getResource("images/shield.png"));
-//				}
-//				catch (IOException ex){
-//
-//				}
-//			break;
-//		}
-//	}
+    Resources res = WorkoutTimer.context.getResources();
+    Bitmap sprite;
+
+	powerup(int _type,int _x,int _y){
+		type = _type;
+		x = _x;
+		y = _y;
+
+		switch(type){
+			case LASER:
+                sprite = BitmapFactory.decodeResource(res, R.drawable.laser);
+			break;
+			case HEALTH:
+                sprite = BitmapFactory.decodeResource(res, R.drawable.health);
+            break;
+			case NUKE:
+                sprite = BitmapFactory.decodeResource(res, R.drawable.nuke);
+            break;
+			case TWOSHOT:
+                sprite = BitmapFactory.decodeResource(res, R.drawable.twoshot);
+            break;
+			case SHOTGUN:
+                sprite = BitmapFactory.decodeResource(res, R.drawable.shotgun);
+            break;
+			case SHIELD:
+                sprite = BitmapFactory.decodeResource(res, R.drawable.shield);
+            break;
+		}
+	}
 	public boolean move(){
 		if(alive > life){
 			return false;
@@ -86,4 +63,6 @@ public class powerup{
 			return true;
 		}
 	}
+
+
 }

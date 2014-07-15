@@ -3,10 +3,15 @@ package dudeofawesome.spaceZombies;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
+import android.media.SoundPool;
+import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -22,7 +27,11 @@ import android.view.WindowManager;
 import com.google.android.gms.ads.*;
 import com.google.android.gms.games.Games;
 import com.google.example.games.basegameutils.BaseGameActivity;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
+
+import dudeofawesome.spaceZombies.util.IabException;
 import dudeofawesome.spaceZombies.util.IabHelper;
 import dudeofawesome.spaceZombies.util.IabResult;
 import dudeofawesome.spaceZombies.util.Inventory;
@@ -31,7 +40,7 @@ import dudeofawesome.spaceZombies.util.Purchase;
 
 public class WorkoutTimer extends BaseGameActivity implements OnClickListener, SensorEventListener {
     //constants
-    public static final String VERSION = "1.4";
+    public static final String VERSION = "1.41";
 
     public static final int EXPLOSION = 0;
     public static final int SMOKE = 1;
@@ -68,6 +77,7 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
     public static int shieldLife = 400;
     public static int shieldAlive = 0;
     private static int zombiesKilled = 0;
+    public static Context context;
 
     private static float[] accelerometerData = {0f,0f};
     private static float[] accelerometerZeroes = {0f,0f};
@@ -75,7 +85,11 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 
+    private SoundPool soundPool;
+    private int ENEMYEXPLODESOUND;
+    private int YOUEXPLODESOUND;
 
+    private boolean iveBeenSupported = false;
 
     private DrawWorkoutTimer drawWorkoutTimer;
     private Handler frame = new Handler();
@@ -92,7 +106,11 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout_timer);
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
 
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -100,11 +118,20 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
         screenWidth = size.x;
         screenHeight = size.y;
 
-        characters.add(new character(350,350,15,7,Color.CYAN));
+        context = this.getBaseContext();
+
+        SharedPreferences mPrefs = getSharedPreferences(TAG, 0);
+        zombiesKilled = mPrefs.getInt("zombiesKilled", 0);
+
+        characters.add(new character(screenWidth / 2,screenHeight / 2,15,7,Color.CYAN));
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+
+        soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        ENEMYEXPLODESOUND = soundPool.load(context, R.raw.enemyexplode, 1);
+        YOUEXPLODESOUND = soundPool.load(context, R.raw.youexplode, 1);
 
         ((Button)findViewById(R.id.btnStart)).setOnClickListener(this);
         ((Button)findViewById(R.id.btnCalibrate)).setOnClickListener(this);
@@ -114,9 +141,15 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         findViewById(R.id.sign_out_button).setOnClickListener(this);
 
-        String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxyDfpUx0t6ffrQAUkfEYGiM4bfRu043AW5xDpVBQbnt10jRgD0NmdsVi+Zyua8yx9m1klesxA38eCV/GScZ+S2xBFoyS1SkSnTeT5PBPnLs1/eIOABIvlKdwQAk7BgCxERFcp2Q9CEr60j3V+VoD0tp0NVj9qE39rZ8KhnM5ZXwxhaAB6aHRQoyXwuMMfMXcmlhJWo4xiPoeb8eNe7KqVQr0Fh4vSSuLdWMEcHV3RtLiUszucncQMTZ5NKCbALPepyAEsf/0T7AxYd0yYpONNX1zvJEKh1QX6VjmFwXLr9k4E+r7uynJ5v9AyUbvNTd9SxVL6P7xuaCoJnEW1o8+gwIDAQAB";
+        String base64EncodedPublicKey0 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxyDfpUx0t6ffrQAUkfEYGiM4b";
+        String base64EncodedPublicKey1 = "fRu043AW5xDpVBQbnt10jRgD0NmdsVi+Zyua8yx9m1klesxA38eCV/GScZ+S2xBFoyS1SkSnTeT5PBPnLs1/eIOABIvlKdwQAk7BgCxERFcp2Q9CEr60j3V+VoD0tp0NVj9qE39rZ8KhnM5ZXwxhaAB6aHRQoyXwuMMfMXcmlhJWo";
+        String base64EncodedPublicKey2 = "4xiPoeb8eNe7KqVQr0Fh4vSSuLdWMEcHV3RtLiUszucncQMTZ5NKCbALPepyAEsf/0T7AxYd0yYpONNX1zvJEKh1QX6VjmFwXLr9k4E+";
+        String base64EncodedPublicKey3 = "r7uynJ5v9AyUbvMTd9SxVL6P7xuaCoJnEW1o8+gwIDAQAB";
+        String base64EncodedPublicKey4 = "r7uynJ5v9AyUbvNTd9SxVL6P7xuaCoJnEW1o8+gwIDAQAB";
 
-        mHelper = new IabHelper(this, base64EncodedPublicKey);
+        if (base64EncodedPublicKey3 == "") {}
+
+        mHelper = new IabHelper(this, base64EncodedPublicKey0 + base64EncodedPublicKey1 + base64EncodedPublicKey2 + base64EncodedPublicKey4);
 
         mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
                                public void onIabSetupFinished(IabResult result)
@@ -124,8 +157,41 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
                                        if (!result.isSuccess()) {
                                            Log.d(TAG, "In-app Billing setup failed: " +
                                                    result);
+
+                                           if (iveBeenSupported)
+                                               findViewById(R.id.btnBuy).setVisibility(View.INVISIBLE);
+                                           else {
+                                               AdView adView = (AdView) findViewById(R.id.adView);
+                                               AdRequest adRequest = new AdRequest.Builder().build();
+                                               adView.loadAd(adRequest);
+                                          }
                                        } else {
                                            Log.d(TAG, "In-app Billing is set up OK");
+
+                                           IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
+                                               public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+                                                   Log.d(TAG, "Query inventory started"); //Log that were checking inventory
+                                                   if (mHelper == null) return; // Have we been disposed of in the meantime? If so, quit
+                                                   if (result.isFailure()) { // Is inventory query a failure?
+                                                       Log.d(TAG, "Failed to query inventory: " + result);
+                                                       return;
+                                                   }
+                                                   Log.d(TAG, "Query inventory was successful."); //if query not a failure then log success
+                                                   Purchase premiumPurchase = inventory.getPurchase(ITEM_SKU); // Do we already have the premium upgrade?
+                                                   iveBeenSupported = (premiumPurchase != null);//) && verifyDeveloperPayload(premiumPurchase));
+                                                   Log.d(TAG, "User is " + (iveBeenSupported ? "PREMIUM" : "NOT PREMIUM")); //log if premium or not
+
+                                                   if (iveBeenSupported)
+                                                       findViewById(R.id.btnBuy).setVisibility(View.INVISIBLE);
+                                                   else {
+                                                       AdView adView = (AdView) findViewById(R.id.adView);
+                                                       AdRequest adRequest = new AdRequest.Builder().build();
+                                                       adView.loadAd(adRequest);
+                                                   }
+                                               }
+                                           };
+
+                                           mHelper.queryInventoryAsync(mGotInventoryListener);
                                        }
                                    }
                                });
@@ -134,11 +200,6 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
             findViewById(R.id.sign_in_button).setVisibility(View.INVISIBLE);
             findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
         }
-
-        // Look up the AdView as a resource and load a request.
-        AdView adView = (AdView)this.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
     }
     @Override
     public void onStart(){
@@ -160,11 +221,16 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
     }
 
     private void hideInterface() {
-        findViewById(R.id.uiLayout).setVisibility(View.INVISIBLE);
+//        findViewById(R.id.uiLayout).setVisibility(View.INVISIBLE);
     }
 
+    private GLSurfaceView GLview;
+
     synchronized public void startGame() {
-        ((Button)findViewById(R.id.btnStart)).setEnabled(true);
+        GLview = new MyRenderer(this);
+        setContentView(GLview);
+
+//        ((Button)findViewById(R.id.btnStart)).setEnabled(true);
         //It's a good idea to remove any existing callbacks to keep
         //them from inadvertently stacking up.
 
@@ -176,7 +242,7 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
         powerups.clear();
 
         characters.clear();
-        characters.add(new character(350,350,15,7,Color.CYAN));
+        characters.add(new character(screenWidth / 2,screenHeight / 2,15,7,Color.CYAN));
         bullets.clear();
         particles.clear();
         powerups.clear();
@@ -241,13 +307,13 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
                 {
                     if (result.isFailure()) {
                         // Handle error
-                        showAlert("Failed to buy");
-                        showAlert("But you can remove ads anyways :)");
+                        showAlert("The transaction seems to have failed, but you can remove ads anyways :)");
                         AdView adView = (AdView)findViewById(R.id.adView);
                         adView.destroy();
                         return;
                     }
                     else if (purchase.getSku().equals(ITEM_SKU)) {
+                        iveBeenSupported = true;
                         AdView adView = (AdView)findViewById(R.id.adView);
                         adView.destroy();
                     }
@@ -387,8 +453,7 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
                         particles.add(new particle(EXPLOSION,characters.get(i).x,characters.get(i).y));
                     }
                     characters.remove(i);
-                    //@debug
-                    //new AePlayWave(getClass().getResource("/sounds/enemyExplode.wav").toString().split(":")[1]).start();
+                    soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
                 }
                 else{
                     characters.get(0).health -= 25;
@@ -410,10 +475,9 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
 
                         characters.remove(0);
 
-                        awardAchievements();
+                        soundPool.play(YOUEXPLODESOUND, 1, 1, 0, 0, 1);
 
-                        //@debug
-                        //new AePlayWave(getClass().getClassLoader().getResourceAsStream("/sounds/youExplode.wav").toString().split(":")[1]).start();
+                        awardAchievements();
                     }
                 }
             }
@@ -430,8 +494,7 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
                     totalScore += characters.size() * 100;
                     character player = characters.get(0);
                     characters.clear();
-                    //@debug
-                    //new AePlayWave(getClass().getResource("/sounds/enemyExplode.wav").toString().split(":")[1]).start();
+                    soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
 
                     characters.add(player);
                     int numOfParts = (int) (Math.random() * 20 + 100);
@@ -495,29 +558,27 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
                         particles.add(new particle(EXPLOSION,characters.get(j).x,characters.get(j).y));
                     }
 
-                    int randomNumber = (int) (Math.random() * 35);
+                    int randomNumber = (int) (Math.random() * 200);
                     if(randomNumber == 3){
-                        //@debug
-                        // if(0 == 0){
                         //add new powerup
-                        switch((int) (Math.random() * 7)){
-                            case 0:
-//                                powerups.add(new powerup(LASER,characters.get(j).x + characters.get(j).diameter / 2,characters.get(j).y + characters.get(j).diameter / 2));
-                                break;
-                            case 1:
-//                                powerups.add(new powerup(NUKE,characters.get(j).x + characters.get(j).diameter / 2,characters.get(j).y + characters.get(j).diameter / 2));
+                        switch((int) (Math.random() * 11)){
+                            case 0: case 1:
+                                powerups.add(new powerup(LASER,characters.get(j).x + characters.get(j).diameter / 2,characters.get(j).y + characters.get(j).diameter / 2));
                                 break;
                             case 2:
-//                                powerups.add(new powerup(TWOSHOT,characters.get(j).x + characters.get(j).diameter / 2,characters.get(j).y + characters.get(j).diameter / 2));
+                                powerups.add(new powerup(NUKE,characters.get(j).x + characters.get(j).diameter / 2,characters.get(j).y + characters.get(j).diameter / 2));
                                 break;
-                            case 3:
-//                                powerups.add(new powerup(SHOTGUN,characters.get(j).x + characters.get(j).diameter / 2,characters.get(j).y + characters.get(j).diameter / 2));
+                            case 3: case 4: case 5: case 6:
+                                powerups.add(new powerup(TWOSHOT,characters.get(j).x + characters.get(j).diameter / 2,characters.get(j).y + characters.get(j).diameter / 2));
                                 break;
-                            case 4: case 5:
-//                                powerups.add(new powerup(HEALTH,characters.get(j).x + characters.get(j).diameter / 2,characters.get(j).y + characters.get(j).diameter / 2));
+                            case 7: case 8: case 9:
+                                powerups.add(new powerup(SHOTGUN,characters.get(j).x + characters.get(j).diameter / 2,characters.get(j).y + characters.get(j).diameter / 2));
                                 break;
-                            case 6:
-//                                powerups.add(new powerup(SHIELD,characters.get(j).x + characters.get(j).diameter / 2,characters.get(j).y + characters.get(j).diameter / 2));
+                            case 10:
+                                powerups.add(new powerup(HEALTH,characters.get(j).x + characters.get(j).diameter / 2,characters.get(j).y + characters.get(j).diameter / 2));
+                                break;
+                            case 11:
+                                powerups.add(new powerup(SHIELD,characters.get(j).x + characters.get(j).diameter / 2,characters.get(j).y + characters.get(j).diameter / 2));
                                 break;
                         }
                     }
@@ -526,14 +587,7 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
                     characters.remove(j);
                     bullets.remove(i);
 
-                    //@debug
-                    // System.out.println(getClass().getResource("sounds/enemyExplode.wav").toString().split(":")[0] + "..." + getClass().getResource("sounds/enemyExplode.wav").toString().split(":")[1] + "..." + getClass().getResource("sounds/enemyExplode.wav").toString().split(":")[2]);
-//                    if(this.getClass().getResource("/sounds/enemyExplode.wav").toString().split(":")[1].equals("file")){
-                        //new AePlayWave(this.getClass().getResource("/sounds/enemyExplode.wav").toString().split(":")[2]).start();
-//                    }
-//                    else{
-                        //new AePlayWave(this.getClass().getResource("/sounds/enemyExplode.wav").toString().split(":")[1]).start();
-//                    }
+                    soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
 
                     increase = false;
 
@@ -570,8 +624,7 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
                         //remove bullet and character
                         characters.remove(j);
 
-                        //@debug
-                        //new AePlayWave(getClass().getResource("/sounds/enemyExplode.wav").toString().split(":")[1]).start();
+                        soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
 
                         //give 150 points for killing enemy
                         totalScore += 150;
@@ -610,6 +663,10 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
             Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Higher_Scorer));
 
         Games.Leaderboards.submitScore(getApiClient(), getString(R.string.leaderboard_High_Scores), totalScore);
+
+        SharedPreferences mPrefs = getSharedPreferences(TAG, 0);
+        SharedPreferences.Editor mEditor = mPrefs.edit();
+        mEditor.putInt("zombiesKilled", zombiesKilled).commit();
     }
 
     public boolean circleCircleCollision(int _x1,int _y1,int _diam1,int _x2,int _y2,int _diam2,int _marginForError){
@@ -798,10 +855,12 @@ public class WorkoutTimer extends BaseGameActivity implements OnClickListener, S
                 moveBullets();
                 moveParticles();
                 movePowerups();
-                ((DrawWorkoutTimer)findViewById(R.id.WorkoutTimerView)).invalidate();
+//                ((DrawWorkoutTimer)findViewById(R.id.WorkoutTimerView)).invalidate();
+//                findViewById(R.id.surfaceView).invalidate();
             }
             else{
-                ((DrawWorkoutTimer)findViewById(R.id.WorkoutTimerView)).invalidate();
+//                ((DrawWorkoutTimer)findViewById(R.id.WorkoutTimerView)).invalidate();
+//                findViewById(R.id.surfaceView).requestRender();
             }
 
 

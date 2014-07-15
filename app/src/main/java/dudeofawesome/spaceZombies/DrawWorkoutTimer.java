@@ -1,16 +1,12 @@
 package dudeofawesome.spaceZombies;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
-import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
-import java.util.LinkedList;
 
 
 public class DrawWorkoutTimer extends View {
@@ -38,7 +34,8 @@ public class DrawWorkoutTimer extends View {
         paint.setFlags(Paint.ANTI_ALIAS_FLAG);
         paint.setStrokeWidth(5);
 
-     }
+        
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -79,12 +76,12 @@ public class DrawWorkoutTimer extends View {
          }
          //draw powerups
          for(int i = 0;i < WorkoutTimer.powerups.size();i++){
-//             canvas.drawImage(WorkoutTimer.powerups.get(i).sprite,WorkoutTimer.powerups.get(i).x - WorkoutTimer.powerups.get(i).diameter / 2,WorkoutTimer.powerups.get(i).y - WorkoutTimer.powerups.get(i).diameter / 2,WorkoutTimer.powerups.get(i).diameter,WorkoutTimer.powerups.get(i).diameter,null);
+             canvas.drawBitmap(WorkoutTimer.powerups.get(i).sprite, WorkoutTimer.powerups.get(i).x - WorkoutTimer.powerups.get(i).diameter / 2,WorkoutTimer.powerups.get(i).y - WorkoutTimer.powerups.get(i).diameter / 2,paint);
          }
          //draw shield
          for(int i = 0;i < WorkoutTimer.characters.get(0).collectedPowerups.size();i++){
              if(WorkoutTimer.characters.get(0).collectedPowerups.get(i) == WorkoutTimer.SHIELD){
-                 if(WorkoutTimer.gamePaused != true && WorkoutTimer.gameOver != true){
+                 if(!WorkoutTimer.gamePaused && !WorkoutTimer.gameOver){
                      WorkoutTimer.shieldAlive += 1;
                  }
                  paint.setColor(Color.argb(70,18,255,0));
@@ -104,10 +101,10 @@ public class DrawWorkoutTimer extends View {
          paint.setTextSize(30);
          canvas.drawText(WorkoutTimer.totalScore + "",getWidth() - 200,getHeight() - 120,paint);
 
-         if(WorkoutTimer.gamePaused == false && WorkoutTimer.gameOver == false){
+         if(!WorkoutTimer.gamePaused && !WorkoutTimer.gameOver){
              WorkoutTimer.shootBullet();
          }
-         else if(WorkoutTimer.gamePaused == true){
+         else if(!WorkoutTimer.gamePaused){
              paint.setColor(Color.WHITE);
              paint.setStrokeWidth(5);
              paint.setTextSize(40);
@@ -124,10 +121,6 @@ public class DrawWorkoutTimer extends View {
              paint.setTextSize(20);
              canvas.drawText("Version: " + WorkoutTimer.VERSION,80,190,paint);
              paint.setColor(Color.argb(200,200,0,0));
-
-             if(WorkoutTimer.particles.size() == 0){
-
-             }
          }
     }
 }

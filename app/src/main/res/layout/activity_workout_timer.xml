@@ -10,14 +10,22 @@
     tools:context=".WorkoutTimer"
     android:background="#ff000000">
 
-    <view
+    <!--<view
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         class="dudeofawesome.spaceZombies.DrawWorkoutTimer"
         android:id="@+id/WorkoutTimerView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true" />-->
+
+    <!--<GLSurfaceView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/surfaceView"
+        class="dudeofawesome.spaceZombies.MyRenderer"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />-->
 
     <RelativeLayout
         android:id="@+id/uiLayout"
@@ -141,6 +149,7 @@
             android:layout_centerHorizontal="true"
             ads:adUnitId="ca-app-pub-4879687351416731/7997552404"
             ads:adSize="BANNER"/>
+
     </RelativeLayout>
 
 </RelativeLayout>
