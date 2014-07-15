@@ -25,7 +25,7 @@ public class powerup{
 
 	public int type = LASER;
 	public int x,y,diameter = 20,life = 1000,alive;
-    Resources res = WorkoutTimer.context.getResources();
+    Resources res = Main.context.getResources();
     Bitmap sprite;
 
 	powerup(int _type,int _x,int _y){
