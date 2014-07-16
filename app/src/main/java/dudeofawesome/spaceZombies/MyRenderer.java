@@ -28,7 +28,7 @@ public class MyRenderer extends GLSurfaceView implements Drawer {
         // Set the Renderer for drawing on the GLSurfaceView
         mRenderer = new SpriteBatcher(context, resourceIDs, this);
         mRenderer.setFontParams(R.string.audiowide_font, new FontParams().size(30));
-        mRenderer.setMaxFPS(30);
+//        mRenderer.setMaxFPS(60);
         setRenderer(mRenderer);
     }
 
@@ -38,7 +38,7 @@ public class MyRenderer extends GLSurfaceView implements Drawer {
         // Set the Renderer for drawing on the GLSurfaceView
         mRenderer = new SpriteBatcher(context, resourceIDs, this);
         mRenderer.setFontParams(R.string.audiowide_font, new FontParams().size(30));
-        mRenderer.setMaxFPS(30);
+//        mRenderer.setMaxFPS(60);
         setRenderer(mRenderer);
     }
 
@@ -48,48 +48,34 @@ public class MyRenderer extends GLSurfaceView implements Drawer {
 
     @Override
     public void onDrawFrame(GL10 gl, SpriteBatcher sb) {
-        src.set(0,0,20,20);
-        dest.set(100, 100, 20, 20);
-
         //draw particles
         for(int i = 0; i < GameLoop.particles.size(); i++){
             if (GameLoop.particles.get(i) != null) {
-                src.set(0, 0, 64, 64);
+                src.set(0, 0, 16, 16);
                 dest.set(GameLoop.particles.get(i).x, GameLoop.particles.get(i).y, GameLoop.particles.get(i).x + GameLoop.particles.get(i).diameter, GameLoop.particles.get(i).y + GameLoop.particles.get(i).diameter);
                 sb.draw(R.drawable.particle, src, dest, 0, Color.argb(GameLoop.particles.get(i).opacity, Color.red(GameLoop.particles.get(i).color), Color.green(GameLoop.particles.get(i).color), Color.blue(GameLoop.particles.get(i).color)));
             }
         }
         //draw player
-//        paint.setColor(WorkoutTimer.characters.get(0).color);
-//        paint.setAlpha(255);
-//        sb.drawCircle(WorkoutTimer.characters.get(0).x,WorkoutTimer.characters.get(0).y,WorkoutTimer.characters.get(0).diameter/2,paint);
-        src.set(0,0,64,64);
+        src.set(0, 0, 16, 16);
         dest.set(GameLoop.characters.get(0).x, GameLoop.characters.get(0).y, GameLoop.characters.get(0).x + GameLoop.characters.get(0).diameter, GameLoop.characters.get(0).y + GameLoop.characters.get(0).diameter);
         sb.draw(R.drawable.player, src, dest);
 
         //draw zombies
         for(int i = 1;i < GameLoop.characters.size(); i++){
-//            paint.setColor(WorkoutTimer.characters.get(i).color);
-//            paint.setStrokeWidth(3);
-//            sb.drawCircle(WorkoutTimer.characters.get(i).x,WorkoutTimer.characters.get(i).y,WorkoutTimer.characters.get(i).diameter/2,paint);
-            src.set(0, 0, 64, 64);
+            src.set(0, 0, 16, 16);
             dest.set(GameLoop.characters.get(i).x, GameLoop.characters.get(i).y, GameLoop.characters.get(i).x + GameLoop.characters.get(i).diameter, GameLoop.characters.get(i).y + GameLoop.characters.get(i).diameter);
             sb.draw(R.drawable.enemy, src, dest);
         }
         //draw bullets
         for(int i = 0;i < GameLoop.bullets.size(); i++){
-//            paint.setColor(WorkoutTimer.bullets.get(i).color);
-//            paint.setStrokeWidth(3);
-//            sb.drawCircle(WorkoutTimer.bullets.get(i).x,WorkoutTimer.bullets.get(i).y,WorkoutTimer.bullets.get(i).diameter/2,paint);
-            src.set(0, 0, 64, 64);
+            src.set(0, 0, 16, 16);
             dest.set(GameLoop.bullets.get(i).x, GameLoop.bullets.get(i).y, GameLoop.bullets.get(i).x + GameLoop.bullets.get(i).diameter, GameLoop.bullets.get(i).y + GameLoop.bullets.get(i).diameter);
             sb.draw(R.drawable.particle, src, dest);
         }
         //draw laser
         for(int i = 0;i < GameLoop.characters.get(0).collectedPowerups.size();i++){
             if(GameLoop.characters.get(0).collectedPowerups.get(i) == GameLoop.LASER){
-//                paint.setColor(WorkoutTimer.laser.color);
-//                paint.setStrokeWidth(WorkoutTimer.laser.width);
                 sb.drawLine(R.drawable.enemy,src, GameLoop.laser.x1, GameLoop.laser.y1, GameLoop.laser.x2, GameLoop.laser.y2, GameLoop.laser.width);
             }
         }
@@ -120,16 +106,12 @@ public class MyRenderer extends GLSurfaceView implements Drawer {
         }
 
         //draw score
-//        paint.setColor(Color.GRAY);
-//        paint.setTextSize(30);
         sb.drawText(R.string.audiowide_font, GameLoop.totalScore + "",getWidth() - 200,getHeight() - 120,1.0f);
 
         if(!GameLoop.gamePaused && !GameLoop.gameOver){
             GameLoop.shootBullet();
         }
         else if(!GameLoop.gamePaused){
-//            paint.setColor(Color.WHITE);
-//            paint.setStrokeWidth(5);
 //            paint.setTextSize(40);
             sb.drawText(R.string.audiowide_font,"Game Paused",100,150,1.0f);
 //            paint.setTextSize(20);
@@ -137,14 +119,10 @@ public class MyRenderer extends GLSurfaceView implements Drawer {
         }
         else{
             //draw game over message if game over
-//            paint.setColor(Color.RED);
-
-//            paint.setStrokeWidth(5);
 //            paint.setTextSize(40);
             sb.drawText(R.string.audiowide_font,"Game Over",100,150,1.0f,0xFFFF0000);
-//            paint.setTextSize(20);
             sb.drawText(R.string.audiowide_font,"Version: " + GameLoop.VERSION,100,190,0.7f,0xFFFF0000);
-//            paint.setColor(Color.argb(200,200,0,0));
         }
+//        System.out.println();
     }
 }

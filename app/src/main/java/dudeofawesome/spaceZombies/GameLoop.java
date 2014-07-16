@@ -640,22 +640,24 @@ public class GameLoop extends BaseGameActivity implements OnClickListener, Senso
     }
 
     private void awardAchievements() {
-        if(zombiesKilled >= 1)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Zombie_Slayer));
-        if(zombiesKilled >= 50)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Better_Zombie_Slayer));
-        if(zombiesKilled >= 500)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Super_Zombie_Slayer));
-        if(zombiesKilled >= 5000)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Ultimate_Zombie_Slayer));
-        if(zombiesKilled >= 500000)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Supreme_Overlord_Zombie_Slayer));
-        if(totalScore > 5000)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_High_Scorer));
-        if(totalScore > 20000)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Higher_Scorer));
+        if (isSignedIn()) {
+            if (zombiesKilled >= 1)
+                Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Zombie_Slayer));
+            if (zombiesKilled >= 50)
+                Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Better_Zombie_Slayer));
+            if (zombiesKilled >= 500)
+                Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Super_Zombie_Slayer));
+            if (zombiesKilled >= 5000)
+                Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Ultimate_Zombie_Slayer));
+            if (zombiesKilled >= 500000)
+                Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Supreme_Overlord_Zombie_Slayer));
+            if (totalScore > 5000)
+                Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_High_Scorer));
+            if (totalScore > 20000)
+                Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Higher_Scorer));
 
-        Games.Leaderboards.submitScore(getApiClient(), getString(R.string.leaderboard_High_Scores), totalScore);
+            Games.Leaderboards.submitScore(getApiClient(), getString(R.string.leaderboard_High_Scores), totalScore);
+        }
 
         SharedPreferences mPrefs = getSharedPreferences(TAG, 0);
         SharedPreferences.Editor mEditor = mPrefs.edit();
