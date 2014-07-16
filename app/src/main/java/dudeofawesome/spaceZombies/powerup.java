@@ -5,10 +5,7 @@
 
 package dudeofawesome.spaceZombies;
 
-import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 //import java.awt.image.BufferedImage;
 //import java.io.File;
@@ -25,8 +22,8 @@ public class powerup{
 
 	public int type = LASER;
 	public int x,y,diameter = 20,life = 1000,alive;
-    Resources res = Main.context.getResources();
-    Bitmap sprite;
+    Resources res = GameLoop.context.getResources();
+    int sprite;
 
 	powerup(int _type,int _x,int _y){
 		type = _type;
@@ -35,22 +32,22 @@ public class powerup{
 
 		switch(type){
 			case LASER:
-                sprite = BitmapFactory.decodeResource(res, R.drawable.laser);
+                sprite = R.drawable.laser;
 			break;
 			case HEALTH:
-                sprite = BitmapFactory.decodeResource(res, R.drawable.health);
+                sprite = R.drawable.health;
             break;
 			case NUKE:
-                sprite = BitmapFactory.decodeResource(res, R.drawable.nuke);
+                sprite = R.drawable.nuke;
             break;
 			case TWOSHOT:
-                sprite = BitmapFactory.decodeResource(res, R.drawable.twoshot);
+                sprite = R.drawable.twoshot;
             break;
 			case SHOTGUN:
-                sprite = BitmapFactory.decodeResource(res, R.drawable.shotgun);
+                sprite = R.drawable.shotgun;
             break;
 			case SHIELD:
-                sprite = BitmapFactory.decodeResource(res, R.drawable.shield);
+                sprite = R.drawable.shield;
             break;
 		}
 	}

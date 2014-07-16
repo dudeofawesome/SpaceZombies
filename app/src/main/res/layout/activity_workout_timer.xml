@@ -7,20 +7,25 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".Main"
+    tools:context=".GameLoop"
     android:background="#ff000000">
 
-    <dudeofawesome.spaceZombies.Painter
+    <dudeofawesome.spaceZombies.MyRenderer
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        class="dudeofawesome.spaceZombies.Painter"
-        android:id="@+id/gameCanvas"
+        class="dudeofawesome.spaceZombies.MyRenderer"
+        android:id="@+id/gameSurface"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentBottom="true" />
+
+    <!--<GLSurfaceView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/surfaceView"
+        class="dudeofawesome.spaceZombies.MyRenderer"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />-->
 
     <RelativeLayout
         android:id="@+id/uiLayout"

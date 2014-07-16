@@ -10,6 +10,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,9 +38,9 @@ import dudeofawesome.spaceZombies.util.Inventory;
 import dudeofawesome.spaceZombies.util.Purchase;
 
 
-public class Main extends BaseGameActivity implements OnClickListener, SensorEventListener {
+public class GameLoop extends BaseGameActivity implements OnClickListener, SensorEventListener {
     //constants
-    public static final String VERSION = "1.41";
+    public static final String VERSION = "1.50b";
 
     public static final int EXPLOSION = 0;
     public static final int SMOKE = 1;
@@ -84,13 +85,12 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 
-    private SoundPool soundPool;
-    private int ENEMYEXPLODESOUND;
-    private int YOUEXPLODESOUND;
+//    private SoundPool soundPool;
+//    private int ENEMYEXPLODESOUND;
+//    private int YOUEXPLODESOUND;
 
     private boolean iveBeenSupported = false;
 
-    private DrawWorkoutTimer drawWorkoutTimer;
     private Handler frame = new Handler();
 
 
@@ -99,15 +99,11 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
     IabHelper mHelper;
     static final String ITEM_SKU = "dudeofawesome.spacezombies.removeads";
 
-    Painter painter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout_timer);
-
-        painter = (Painter)findViewById(R.id.gameCanvas);
-//        painter = new Painter(this);
-//        setContentView(painter);
 
 //        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -132,9 +128,9 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
-        soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
-        ENEMYEXPLODESOUND = soundPool.load(context, R.raw.enemyexplode, 1);
-        YOUEXPLODESOUND = soundPool.load(context, R.raw.youexplode, 1);
+//        soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+//        ENEMYEXPLODESOUND = soundPool.load(context, R.raw.enemyexplode, 1);
+//        YOUEXPLODESOUND = soundPool.load(context, R.raw.youexplode, 1);
 
         ((Button)findViewById(R.id.btnStart)).setOnClickListener(this);
         ((Button)findViewById(R.id.btnCalibrate)).setOnClickListener(this);
@@ -155,56 +151,54 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
         mHelper = new IabHelper(this, base64EncodedPublicKey0 + base64EncodedPublicKey1 + base64EncodedPublicKey2 + base64EncodedPublicKey4);
 
         mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
-            public void onIabSetupFinished(IabResult result)
-            {
-                if (!result.isSuccess()) {
-                    Log.d(TAG, "In-app Billing setup failed: " +
-                            result);
+                               public void onIabSetupFinished(IabResult result)
+                                   {
+                                       if (!result.isSuccess()) {
+                                           Log.d(TAG, "In-app Billing setup failed: " +
+                                                   result);
 
-                    if (iveBeenSupported)
-                        findViewById(R.id.btnBuy).setVisibility(View.INVISIBLE);
-                    else {
-                        AdView adView = (AdView) findViewById(R.id.adView);
-                        AdRequest adRequest = new AdRequest.Builder().build();
-                        adView.loadAd(adRequest);
-                    }
-                } else {
-                    Log.d(TAG, "In-app Billing is set up OK");
+                                           if (iveBeenSupported)
+                                               findViewById(R.id.btnBuy).setVisibility(View.INVISIBLE);
+                                           else {
+                                               AdView adView = (AdView) findViewById(R.id.adView);
+                                               AdRequest adRequest = new AdRequest.Builder().build();
+                                               adView.loadAd(adRequest);
+                                          }
+                                       } else {
+                                           Log.d(TAG, "In-app Billing is set up OK");
 
-                    IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
-                        public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-                            Log.d(TAG, "Query inventory started"); //Log that were checking inventory
-                            if (mHelper == null) return; // Have we been disposed of in the meantime? If so, quit
-                            if (result.isFailure()) { // Is inventory query a failure?
-                                Log.d(TAG, "Failed to query inventory: " + result);
-                                return;
-                            }
-                            Log.d(TAG, "Query inventory was successful."); //if query not a failure then log success
-                            Purchase premiumPurchase = inventory.getPurchase(ITEM_SKU); // Do we already have the premium upgrade?
-                            iveBeenSupported = (premiumPurchase != null);//) && verifyDeveloperPayload(premiumPurchase));
-                            Log.d(TAG, "User is " + (iveBeenSupported ? "PREMIUM" : "NOT PREMIUM")); //log if premium or not
+                                           IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
+                                               public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+                                                   Log.d(TAG, "Query inventory started"); //Log that were checking inventory
+                                                   if (mHelper == null) return; // Have we been disposed of in the meantime? If so, quit
+                                                   if (result.isFailure()) { // Is inventory query a failure?
+                                                       Log.d(TAG, "Failed to query inventory: " + result);
+                                                       return;
+                                                   }
+                                                   Log.d(TAG, "Query inventory was successful."); //if query not a failure then log success
+                                                   Purchase premiumPurchase = inventory.getPurchase(ITEM_SKU); // Do we already have the premium upgrade?
+                                                   iveBeenSupported = (premiumPurchase != null);//) && verifyDeveloperPayload(premiumPurchase));
+                                                   Log.d(TAG, "User is " + (iveBeenSupported ? "PREMIUM" : "NOT PREMIUM")); //log if premium or not
 
-                            if (iveBeenSupported)
-                                findViewById(R.id.btnBuy).setVisibility(View.INVISIBLE);
-                            else {
-                                AdView adView = (AdView) findViewById(R.id.adView);
-                                AdRequest adRequest = new AdRequest.Builder().build();
-                                adView.loadAd(adRequest);
-                            }
-                        }
-                    };
+                                                   if (iveBeenSupported)
+                                                       findViewById(R.id.btnBuy).setVisibility(View.INVISIBLE);
+                                                   else {
+                                                       AdView adView = (AdView) findViewById(R.id.adView);
+                                                       AdRequest adRequest = new AdRequest.Builder().build();
+                                                       adView.loadAd(adRequest);
+                                                   }
+                                               }
+                                           };
 
-                    mHelper.queryInventoryAsync(mGotInventoryListener);
-                }
-            }
-        });
+                                           mHelper.queryInventoryAsync(mGotInventoryListener);
+                                       }
+                                   }
+                               });
 
         if (isSignedIn()) {
             findViewById(R.id.sign_in_button).setVisibility(View.INVISIBLE);
             findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
         }
-
-        startGame();
     }
     @Override
     public void onStart(){
@@ -222,6 +216,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
     }
 
     private void showInterface() {
+//        setContentView(R.layout.activity_workout_timer);
         findViewById(R.id.uiLayout).setVisibility(View.VISIBLE);
     }
 
@@ -230,7 +225,6 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
     }
 
     synchronized public void startGame() {
-
 //        ((Button)findViewById(R.id.btnStart)).setEnabled(true);
         //It's a good idea to remove any existing callbacks to keep
         //them from inadvertently stacking up.
@@ -311,7 +305,6 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
                         showAlert("The transaction seems to have failed, but you can remove ads anyways :)");
                         AdView adView = (AdView)findViewById(R.id.adView);
                         adView.destroy();
-                        return;
                     }
                     else if (purchase.getSku().equals(ITEM_SKU)) {
                         iveBeenSupported = true;
@@ -328,13 +321,15 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data)
+    {
         if (!mHelper.handleActivityResult(requestCode, resultCode, data)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
-    @Override
+   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.workout_timer, menu);
@@ -360,6 +355,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
 
     public void movePlayer(){
         //move your dot based on its assigned velocity
+        // characters.get(0).move(MOUSEXDISPLACEMENT,MOUSEYDISPLACEMENT);
         int _mouseX = characters.get(0).x + (int) (accelerometerData[0] * -1000);
         int _mouseY = characters.get(0).y + (int) (accelerometerData[1] * 1000);
         characters.get(0).move(_mouseX,_mouseY);
@@ -418,6 +414,10 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
                 particles.remove(i);
             }
         }
+        if (gameOver && particles.size() == 0) {
+            showInterface();
+            awardAchievements();
+        }
     }
 
     public void movePowerups(){
@@ -451,7 +451,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
                         particles.add(new particle(EXPLOSION,characters.get(i).x,characters.get(i).y));
                     }
                     characters.remove(i);
-                    soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
+//                    soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
                 }
                 else{
                     characters.get(0).health -= 25;
@@ -464,18 +464,13 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
                         //game over
                         gameOver = true;
 
-                        showInterface();
-
                         numOfParts = (int) (Math.random() * 50 + 300);
                         for(int k = 0; k < numOfParts;k++){
                             particles.add(new particle(EXPLOSION,characters.get(0).x,characters.get(0).y,10));
                         }
 
                         characters.remove(0);
-
-                        soundPool.play(YOUEXPLODESOUND, 1, 1, 0, 0, 1);
-
-                        awardAchievements();
+//                        soundPool.play(YOUEXPLODESOUND, 1, 1, 0, 0, 1);
                     }
                 }
             }
@@ -492,7 +487,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
                     totalScore += characters.size() * 100;
                     character player = characters.get(0);
                     characters.clear();
-                    soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
+//                    soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
 
                     characters.add(player);
                     int numOfParts = (int) (Math.random() * 20 + 100);
@@ -501,7 +496,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
                     }
                 }
                 else{
-                    int numberOfPowerups = characters.get(0).collectedPowerups.size();
+//                    int numberOfPowerups = characters.get(0).collectedPowerups.size();
                     boolean powerupNotTaken = true;
                     for(int j = 0;j < characters.get(0).collectedPowerups.size();j++){
                         if(characters.get(0).collectedPowerups.get(j) == powerups.get(i).type){
@@ -585,7 +580,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
                     characters.remove(j);
                     bullets.remove(i);
 
-                    soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
+//                    soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
 
                     increase = false;
 
@@ -603,7 +598,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
                     j++;
                 }
             }
-            if(increase == true){
+            if(increase){
                 i++;
             }
         }
@@ -622,7 +617,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
                         //remove bullet and character
                         characters.remove(j);
 
-                        soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
+//                        soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
 
                         //give 150 points for killing enemy
                         totalScore += 150;
@@ -854,13 +849,14 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
                 moveParticles();
                 movePowerups();
             }
-            painter.paint();
 
+//            findViewById(R.id.gameSurface).requestRender();
 
 
             frame.removeCallbacks(frameUpdate);
             //make any updates to on screen objects here
             //then invoke the on draw by invalidating the canvas
+//            ((DrawWorkoutTimer)findViewById(R.id.WorkoutTimerView)).invalidate();
             frame.postDelayed(frameUpdate, FRAME_RATE);
         }
     };
