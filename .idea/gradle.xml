@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/libs" />
             <option value="$PROJECT_DIR$/libs/BaseGameUtils" />
+            <option value="$PROJECT_DIR$/libs/spritebatcher" />
           </set>
         </option>
       </GradleProjectSettings>

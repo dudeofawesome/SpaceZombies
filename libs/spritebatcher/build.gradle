@@ -1,29 +1,24 @@
-apply plugin: 'android'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 20
-    buildToolsVersion '20.0.0'
+    buildToolsVersion "20.0.0"
+
     defaultConfig {
-        applicationId 'dudeofawesome.spaceZombies'
+        applicationId "com.twicecircled.spritebatcher"
         minSdkVersion 15
         targetSdkVersion 20
-        versionCode 141
-        versionName '1.41'
+        versionCode 1
+        versionName "1.0"
     }
     buildTypes {
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            //debuggable false
         }
-    }
-    productFlavors {
     }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.google.android.gms:play-services:5.0.77'
-    compile project(':libs:BaseGameUtils')
-    compile project(':libs:spritebatcher')
 }
