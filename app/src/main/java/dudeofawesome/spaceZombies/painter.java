@@ -1,151 +1,154 @@
 package dudeofawesome.spaceZombies;
 
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.RectF;
+import android.util.AttributeSet;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
-import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
-import android.opengl.Matrix;
-import android.util.Log;
 
-/**
- * Provides drawing instructions for a GLSurfaceView object. This class
- * must override the OpenGL ES drawing lifecycle methods:
- * <ul>
- *   <li>{@link android.opengl.GLSurfaceView.Renderer#onSurfaceCreated}</li>
- *   <li>{@link android.opengl.GLSurfaceView.Renderer#onDrawFrame}</li>
- *   <li>{@link android.opengl.GLSurfaceView.Renderer#onSurfaceChanged}</li>
- * </ul>
- */
-public class painter implements GLSurfaceView.Renderer {
+public class Painter extends SurfaceView implements SurfaceHolder.Callback {
+    private Paint paint;
+    private SurfaceHolder holder;
 
-    private static final String TAG = "MyGLRenderer";
-    private Triangle mTriangle;
-    private Square   mSquare;
+    public Painter(Context context) {
+        super(context);
+        init(null, 0);
 
-    // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
-    private final float[] mMVPMatrix = new float[16];
-    private final float[] mProjectionMatrix = new float[16];
-    private final float[] mViewMatrix = new float[16];
-    private final float[] mRotationMatrix = new float[16];
-
-    private float mAngle;
-
-    @Override
-    public void onSurfaceCreated(GL10 unused, EGLConfig config) {
-
-        // Set the background frame color
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-        mTriangle = new Triangle();
-        mSquare   = new Square();
+        holder = getHolder();
     }
 
-    @Override
-    public void onDrawFrame(GL10 unused) {
-        float[] scratch = new float[16];
+    public Painter(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(attrs, 0);
 
-        // Draw background color
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-
-        // Set the camera position (View matrix)
-        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
-
-        // Calculate the projection and view transformation
-        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
-
-        // Draw square
-        mSquare.draw(mMVPMatrix);
-
-        // Create a rotation for the triangle
-
-        // Use the following code to generate constant rotation.
-        // Leave this code out when using TouchEvents.
-        // long time = SystemClock.uptimeMillis() % 4000L;
-        // float angle = 0.090f * ((int) time);
-
-        Matrix.setRotateM(mRotationMatrix, 0, mAngle++, 0, 0, 1.0f);
-
-        // Combine the rotation matrix with the projection and camera view
-        // Note that the mMVPMatrix factor *must be first* in order
-        // for the matrix multiplication product to be correct.
-        Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
-
-        // Draw triangle
-        mTriangle.draw(scratch);
+        holder = getHolder();
     }
 
-    @Override
-    public void onSurfaceChanged(GL10 unused, int width, int height) {
-        // Adjust the viewport based on geometry changes,
-        // such as screen rotation
-        GLES20.glViewport(0, 0, width, height);
+    public Painter(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        init(attrs, defStyle);
 
-        float ratio = (float) width / height;
-
-        // this projection matrix is applied to object coordinates
-        // in the onDrawFrame() method
-        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
-
+        holder = getHolder();
     }
 
-    /**
-     * Utility method for compiling a OpenGL shader.
-     *
-     * <p><strong>Note:</strong> When developing shaders, use the checkGlError()
-     * method to debug shader coding errors.</p>
-     *
-     * @param type - Vertex or fragment shader type.
-     * @param shaderCode - String containing the shader code.
-     * @return - Returns an id for the shader.
-     */
-    public static int loadShader(int type, String shaderCode){
+    private void init(AttributeSet attrs, int defStyle) {
+        // Set up a default Paint object
+        paint = new Paint();
+        paint.setColor(Color.RED);
+        paint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        paint.setStrokeWidth(5);
 
-        // create a vertex shader type (GLES20.GL_VERTEX_SHADER)
-        // or a fragment shader type (GLES20.GL_FRAGMENT_SHADER)
-        int shader = GLES20.glCreateShader(type);
-
-        // add the source code to the shader and compile it
-        GLES20.glShaderSource(shader, shaderCode);
-        GLES20.glCompileShader(shader);
-
-        return shader;
+        
     }
 
-    /**
-     * Utility method for debugging OpenGL calls. Provide the name of the call
-     * just after making it:
-     *
-     * <pre>
-     * mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
-     * MyGLRenderer.checkGlError("glGetUniformLocation");</pre>
-     *
-     * If the operation is not successful, the check throws an error.
-     *
-     * @param glOperation - Name of the OpenGL call to check.
-     */
-    public static void checkGlError(String glOperation) {
-        int error;
-        while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
-            Log.e(TAG, glOperation + ": glError " + error);
-            throw new RuntimeException(glOperation + ": glError " + error);
+    public void paint() {
+        Canvas canvas = holder.lockCanvas();
+        System.out.println("frame");
+
+        if (canvas != null) {
+            //clear canvas
+            canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+
+            //draw particles
+            for (int i = 0; i < Main.particles.size(); i++) {
+                paint.setColor(Main.particles.get(i).color);
+                paint.setAlpha(Main.particles.get(i).opacity);
+                paint.setStrokeWidth(Main.particles.get(i).lineWidth);
+                canvas.drawCircle(Main.particles.get(i).x, Main.particles.get(i).y, Main.particles.get(i).diameter / 2, paint);
+            }
+            //draw player
+            paint.setColor(Main.characters.get(0).color);
+            paint.setAlpha(255);
+            canvas.drawCircle(Main.characters.get(0).x, Main.characters.get(0).y, Main.characters.get(0).diameter / 2, paint);
+
+            //draw zombies
+            for (int i = 1; i < Main.characters.size(); i++) {
+                paint.setColor(Main.characters.get(i).color);
+                paint.setStrokeWidth(3);
+                canvas.drawCircle(Main.characters.get(i).x, Main.characters.get(i).y, Main.characters.get(i).diameter / 2, paint);
+            }
+            //draw bullets
+            for (int i = 0; i < Main.bullets.size(); i++) {
+                paint.setColor(Main.bullets.get(i).color);
+                paint.setStrokeWidth(3);
+                canvas.drawCircle(Main.bullets.get(i).x, Main.bullets.get(i).y, Main.bullets.get(i).diameter / 2, paint);
+            }
+            //draw laser
+            for (int i = 0; i < Main.characters.get(0).collectedPowerups.size(); i++) {
+                if (Main.characters.get(0).collectedPowerups.get(i) == Main.LASER) {
+                    paint.setColor(Main.laser.color);
+                    paint.setStrokeWidth(Main.laser.width);
+                    canvas.drawLine(Main.laser.x1, Main.laser.y1, Main.laser.x2, Main.laser.y2, paint);
+                }
+            }
+            //draw powerups
+            for (int i = 0; i < Main.powerups.size(); i++) {
+                canvas.drawBitmap(Main.powerups.get(i).sprite, Main.powerups.get(i).x - Main.powerups.get(i).diameter / 2, Main.powerups.get(i).y - Main.powerups.get(i).diameter / 2, paint);
+            }
+            //draw shield
+            for (int i = 0; i < Main.characters.get(0).collectedPowerups.size(); i++) {
+                if (Main.characters.get(0).collectedPowerups.get(i) == Main.SHIELD) {
+                    if (!Main.gamePaused && !Main.gameOver) {
+                        Main.shieldAlive += 1;
+                    }
+                    paint.setColor(Color.argb(70, 18, 255, 0));
+                    paint.setStrokeWidth(3);
+                    canvas.drawCircle(Main.characters.get(0).x, Main.characters.get(0).y, Main.characters.get(0).diameter, paint);
+                    paint.setColor(Color.argb(100, 18, 255, 0));
+                    canvas.drawArc(new RectF(Main.characters.get(0).x - Main.characters.get(0).diameter / 2 - 13, Main.characters.get(0).y - Main.characters.get(0).diameter / 2 - 13, 50, 50), 0, 360 - 360 * Main.shieldAlive / Main.shieldLife, true, paint);
+                    if (Main.shieldAlive > Main.shieldLife) {
+                        Main.characters.get(0).collectedPowerups.remove(i);
+                        Main.shieldAlive = 0;
+                    }
+                }
+            }
+
+            //draw score
+            paint.setColor(Color.GRAY);
+            paint.setTextSize(30);
+            canvas.drawText(Main.totalScore + "", getWidth() - 200, getHeight() - 120, paint);
+
+            if (!Main.gamePaused && !Main.gameOver) {
+                Main.shootBullet();
+            } else if (!Main.gamePaused) {
+                paint.setColor(Color.WHITE);
+                paint.setStrokeWidth(5);
+                paint.setTextSize(40);
+                canvas.drawText("Game Paused", 80, 150, paint);
+                paint.setTextSize(20);
+                canvas.drawText("Version: " + Main.VERSION, 80, 190, paint);
+            } else {
+                //draw game over message if game over
+                paint.setColor(Color.RED);
+                paint.setStrokeWidth(5);
+                paint.setTextSize(40);
+                canvas.drawText("Game Over", 80, 150, paint);
+                paint.setTextSize(20);
+                canvas.drawText("Version: " + Main.VERSION, 80, 190, paint);
+                paint.setColor(Color.argb(200, 200, 0, 0));
+            }
+
+            getHolder().unlockCanvasAndPost(canvas);
         }
     }
 
-    /**
-     * Returns the rotation angle of the triangle shape (mTriangle).
-     *
-     * @return - A float representing the rotation angle.
-     */
-    public float getAngle() {
-        return mAngle;
+    @Override
+    public void surfaceCreated(SurfaceHolder surfaceHolder) {
+
     }
 
-    /**
-     * Sets the rotation angle of the triangle shape (mTriangle).
-     */
-    public void setAngle(float angle) {
-        mAngle = angle;
+    @Override
+    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
+
     }
 
+    @Override
+    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+
+    }
 }
