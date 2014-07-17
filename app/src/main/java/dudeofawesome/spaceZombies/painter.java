@@ -43,19 +43,17 @@ public class Painter extends SurfaceView implements SurfaceHolder.Callback {
         paint.setFlags(Paint.ANTI_ALIAS_FLAG);
         paint.setStrokeWidth(5);
 
-        
+
     }
 
     public void paint() {
         Canvas canvas = holder.lockCanvas();
-        System.out.println("frame");
-
         if (canvas != null) {
             //clear canvas
             canvas.drawColor(0, PorterDuff.Mode.CLEAR);
 
             //draw particles
-            for (int i = 0; i < Main.particles.size(); i++) {
+            for (int i = 0; i < (Main.particles.size() < 300 ? Main.particles.size() : 300); i++) {
                 paint.setColor(Main.particles.get(i).color);
                 paint.setAlpha(Main.particles.get(i).opacity);
                 paint.setStrokeWidth(Main.particles.get(i).lineWidth);

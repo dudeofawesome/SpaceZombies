@@ -8,8 +8,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.AudioManager;
-import android.media.SoundPool;
+//import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -84,13 +83,12 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 
-    private SoundPool soundPool;
-    private int ENEMYEXPLODESOUND;
-    private int YOUEXPLODESOUND;
+//    private SoundPool soundPool;
+//    private int ENEMYEXPLODESOUND;
+//    private int YOUEXPLODESOUND;
 
     private boolean iveBeenSupported = false;
 
-    private DrawWorkoutTimer drawWorkoutTimer;
     private Handler frame = new Handler();
 
 
@@ -132,9 +130,9 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
-        soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
-        ENEMYEXPLODESOUND = soundPool.load(context, R.raw.enemyexplode, 1);
-        YOUEXPLODESOUND = soundPool.load(context, R.raw.youexplode, 1);
+//        soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+//        ENEMYEXPLODESOUND = soundPool.load(context, R.raw.enemyexplode, 1);
+//        YOUEXPLODESOUND = soundPool.load(context, R.raw.youexplode, 1);
 
         ((Button)findViewById(R.id.btnStart)).setOnClickListener(this);
         ((Button)findViewById(R.id.btnCalibrate)).setOnClickListener(this);
@@ -243,7 +241,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
         powerups.clear();
 
         characters.clear();
-        characters.add(new character(screenWidth / 2,screenHeight / 2,15,7,Color.CYAN));
+        characters.add(new character(screenWidth / 2,screenHeight / 2,30,7,Color.CYAN));
         bullets.clear();
         particles.clear();
         powerups.clear();
@@ -451,7 +449,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
                         particles.add(new particle(EXPLOSION,characters.get(i).x,characters.get(i).y));
                     }
                     characters.remove(i);
-                    soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
+//                    soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
                 }
                 else{
                     characters.get(0).health -= 25;
@@ -473,7 +471,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
 
                         characters.remove(0);
 
-                        soundPool.play(YOUEXPLODESOUND, 1, 1, 0, 0, 1);
+//                        soundPool.play(YOUEXPLODESOUND, 1, 1, 0, 0, 1);
 
                         awardAchievements();
                     }
@@ -492,7 +490,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
                     totalScore += characters.size() * 100;
                     character player = characters.get(0);
                     characters.clear();
-                    soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
+//                    soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
 
                     characters.add(player);
                     int numOfParts = (int) (Math.random() * 20 + 100);
@@ -585,7 +583,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
                     characters.remove(j);
                     bullets.remove(i);
 
-                    soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
+//                    soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
 
                     increase = false;
 
@@ -622,7 +620,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
                         //remove bullet and character
                         characters.remove(j);
 
-                        soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
+//                        soundPool.play(ENEMYEXPLODESOUND, 1, 1, 0, 0, (float) Math.random() * 1.5f + 0.5f);
 
                         //give 150 points for killing enemy
                         totalScore += 150;
@@ -645,22 +643,24 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
     }
 
     private void awardAchievements() {
-        if(zombiesKilled >= 1)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Zombie_Slayer));
-        if(zombiesKilled >= 50)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Better_Zombie_Slayer));
-        if(zombiesKilled >= 500)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Super_Zombie_Slayer));
-        if(zombiesKilled >= 5000)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Ultimate_Zombie_Slayer));
-        if(zombiesKilled >= 500000)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Supreme_Overlord_Zombie_Slayer));
-        if(totalScore > 5000)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_High_Scorer));
-        if(totalScore > 20000)
-            Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Higher_Scorer));
+        if (isSignedIn()) {
+            if (zombiesKilled >= 1)
+                Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Zombie_Slayer));
+            if (zombiesKilled >= 50)
+                Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Better_Zombie_Slayer));
+            if (zombiesKilled >= 500)
+                Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Super_Zombie_Slayer));
+            if (zombiesKilled >= 5000)
+                Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Ultimate_Zombie_Slayer));
+            if (zombiesKilled >= 500000)
+                Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Supreme_Overlord_Zombie_Slayer));
+            if (totalScore > 5000)
+                Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_High_Scorer));
+            if (totalScore > 20000)
+                Games.Achievements.unlock(getApiClient(), getString(R.string.achievement_Higher_Scorer));
 
-        Games.Leaderboards.submitScore(getApiClient(), getString(R.string.leaderboard_High_Scores), totalScore);
+            Games.Leaderboards.submitScore(getApiClient(), getString(R.string.leaderboard_High_Scores), totalScore);
+        }
 
         SharedPreferences mPrefs = getSharedPreferences(TAG, 0);
         SharedPreferences.Editor mEditor = mPrefs.edit();
@@ -766,7 +766,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
             //split it up into x and y
             _vX = Math.cos(_angleTo) * 15;
             _vY = Math.sin(_angleTo) * 15;
-            bullets.add(new bullet(characters.get(0).x + characters.get(0).diameter / 2,characters.get(0).y + characters.get(0).diameter / 2,2,_vX,_vY,Color.WHITE));
+            bullets.add(new bullet(characters.get(0).x /*+ characters.get(0).diameter / 2*/,characters.get(0).y /*+ characters.get(0).diameter / 2*/,2,_vX,_vY,Color.WHITE));
 
             if(twoshot){
                 for(int i = 0;i < 6;i++){
@@ -819,7 +819,7 @@ public class Main extends BaseGameActivity implements OnClickListener, SensorEve
             _xLoc = _placeOnEdge;
         }
 
-        int _diameter = (int) (Math.random() * 5 + 9);
+        int _diameter = (int) (Math.random() * 5 + 15);
         // int _totalV = (int) ((16 - _diameter) * 0.85);
         int _totalV = (int) ((24 - _diameter) / 3);
         // int _totalV = 3;
