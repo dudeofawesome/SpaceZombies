@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 300eeb3c3ebda440c88c105bd0387520
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - prefabEnemy: {fileID: 100000, guid: bfd4e280d8ed44263aa86ac1991cae32, type: 2}
+  - mainCamera: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
