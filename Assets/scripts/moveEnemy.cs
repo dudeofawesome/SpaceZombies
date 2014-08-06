@@ -42,7 +42,11 @@ public class moveEnemy : MonoBehaviour {
 	void MyOnCollisionEnter (GameObject go) {
 		if (go.tag == "Player") {
 			addParticlesOnDeath();
-			if (movePlayer.health > 0)
+			// if (GameObject.FindGameObjectWithTag("Player").GetComponent<movePlayer>().health > 0)
+			// 	reset();
+			if (movePlayer.twoshotAlive > 0 || movePlayer.shotgunAlive > 0 && movePlayer.shieldAlive > 0)
+				Destroy(gameObject);
+			else
 				reset();
 		}
 		else if (go.tag == "Bullet") {
@@ -50,7 +54,7 @@ public class moveEnemy : MonoBehaviour {
 			addPowerupsOnDeath();
 			GameEngine.totalZombiesKilled++;
     		GameEngine.totalScore += 100;
-			if (movePlayer.twoshotAlive != 0 || movePlayer.shotgunAlive != 0 && movePlayer.shieldAlive != 0)
+			if (movePlayer.twoshotAlive > 0 || movePlayer.shotgunAlive > 0 && movePlayer.shieldAlive > 0)
 				Destroy(gameObject);
 			else
 				reset();
@@ -59,6 +63,7 @@ public class moveEnemy : MonoBehaviour {
 
 	void addPowerupsOnDeath () {
 		int randomNumber = (int) (Random.value * 150);
+		// int randomNumber = (int) (Random.value * 2);
 		if(randomNumber == 1){
 			//add new powerup
 			GameObject _pu;
@@ -66,7 +71,7 @@ public class moveEnemy : MonoBehaviour {
 				case 0: case 1:
 					_pu = (GameObject) Instantiate(prefabPowerupLaser);
 					_pu.transform.position = transform.position;
-					// _pu.GetComponent<Powerup>().type = Powerup.PowerupType.LASER;
+					_pu.GetComponent<Powerup>().type = Powerup.PowerupType.LASER;
 					break;
 				case 2:
 					_pu = (GameObject) Instantiate(prefabPowerupNuke);
@@ -91,7 +96,7 @@ public class moveEnemy : MonoBehaviour {
 				case 11:
 					_pu = (GameObject) Instantiate(prefabPowerupShield);
 					_pu.transform.position = transform.position;
-					// _pu.GetComponent<Powerup>().type = Powerup.PowerupType.SHIELD;
+					_pu.GetComponent<Powerup>().type = Powerup.PowerupType.SHIELD;
 					break;
 			}
 		}

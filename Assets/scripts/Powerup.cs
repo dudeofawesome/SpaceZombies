@@ -15,6 +15,7 @@ public class Powerup : MonoBehaviour {
 	int smokeCounter = 0;
 
 	[SerializeField] private GameObject prefabParticle = null;
+	[SerializeField] private GameObject prefabShield = null;
 
 	// Use this for initialization
 	void Start () {
@@ -50,10 +51,11 @@ public class Powerup : MonoBehaviour {
 	}
 
 	void MyOnCollisionEnter (GameObject go) {
-		if (go.tag == "Player") {
+		if (go.tag == "Player" && go.name != "Laser") {
     		GameEngine.totalScore += 400;
-			if (type == PowerupType.HEALTH)
-				movePlayer.health += 25;
+			if (type == PowerupType.HEALTH){
+				GameObject.FindGameObjectWithTag("Player").GetComponent<movePlayer>().health += 25;
+			}
 			else if (type == PowerupType.NUKE) {
 				GameObject[] objects = GameObject.FindGameObjectsWithTag("Enemy");
 				for (int i = 0; i < objects.Length; i++){
@@ -71,8 +73,12 @@ public class Powerup : MonoBehaviour {
 					}
 				}
 			}
+			else if (type == PowerupType.SHIELD) {
+				go.GetComponent<movePlayer>().collectedPowerups.Add(type);
+				Instantiate(prefabShield);
+			}
 			else {
-				GameObject.FindGameObjectWithTag("Player").GetComponent<movePlayer>().collectedPowerups.Add(type);
+				go.GetComponent<movePlayer>().collectedPowerups.Add(type);
 			}
 			int nop = (int) (Random.value * 5 + 10);
 			for(int k = 0; k < nop;k++){

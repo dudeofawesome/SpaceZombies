@@ -198,6 +198,12 @@
      <None Include="Assets\Plugins\Android\google-play-services_lib\res\drawable\common_signin_btn_text_light.xml" />
      <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-hi\common_strings.xml" />
      <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-in\auth_strings.xml" />
+ <Reference Include="Assets\Editor\HOTweenV1_Editor">
+ <HintPath>Assets\Editor\HOTweenV1_Editor.dll</HintPath>
+ </Reference>
+ <Reference Include="Assets\HOtween\HOTween">
+ <HintPath>Assets\HOtween\HOTween.dll</HintPath>
+ </Reference>
  <Reference Include="Assets\Plugins\GPGSUtils">
  <HintPath>Assets\Plugins\GPGSUtils.dll</HintPath>
  </Reference>
@@ -212,12 +218,6 @@
  </Reference>
  <Reference Include="\Applications\Unity\Unity.app\Contents\PlaybackEngines\AndroidPlayer\EditorExtensions\UnityEditor.Android.Extensions">
  <HintPath>\Applications\Unity\Unity.app\Contents\PlaybackEngines\AndroidPlayer\EditorExtensions\UnityEditor.Android.Extensions.dll</HintPath>
- </Reference>
- <Reference Include="Assets\HOtween\HOTween">
- <HintPath>Assets\HOtween\HOTween.dll</HintPath>
- </Reference>
- <Reference Include="Assets\Editor\HOTweenV1_Editor">
- <HintPath>Assets\Editor\HOTweenV1_Editor.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -15,7 +15,8 @@ public class moveBullet : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		transform.position = new Vector3 ((float)(transform.position.x + transform.forward.x * 0.01f * velocity), (float)(transform.position.y + transform.forward.y * 0.01f * velocity), 0);
+//		transform.position = new Vector3 ((float)(transform.position.x + transform.forward.x * 0.01f * velocity), (float)(transform.position.y + transform.forward.y * 0.01f * velocity), 0);
+		transform.Translate(new Vector3(velocity / 80f, 0f, 0f));
 
 		// if (!GameEngine.cameraViewSize.Contains(new Vector2(transform.position.x, transform.position.y))) {
 		if (transform.position.x < GameEngine.cameraViewSize.x || transform.position.y > GameEngine.cameraViewSize.y || transform.position.x > GameEngine.cameraViewSize.width || transform.position.y < GameEngine.cameraViewSize.height) {

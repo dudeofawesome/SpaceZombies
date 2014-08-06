@@ -20,6 +20,7 @@ public class gameGUI : MonoBehaviour {
 
 	[SerializeField] GameEngine gameEngine = null;
 	[SerializeField] GUISkin guiSkin;
+	[SerializeField] GUISkin plainLabel;
 
 	// Use this for initialization
 	void Start () {
@@ -41,47 +42,58 @@ public class gameGUI : MonoBehaviour {
 	}
 
 	void OnGUI () {
-		GUI.skin = guiSkin;
+		// GUI.color.a = 0.8f;\
+		Color _c = new Color(1f,1f,1f,0.8f);
+		GUI.color = _c;
+		GUI.skin = plainLabel;
 		GUI.Label(new Rect(5, 5, Screen.width, 50), messages);
 
 		var svMat = GUI.matrix; // save current matrix
 		GUI.matrix = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, scale);
 
-		GUI.Label(new Rect(originalWidth - 50, originalHeight - 30, 45, 25), GameEngine.totalScore + "");
+		GUI.Label(new Rect(originalWidth - 60, originalHeight - 30, 45, 25), GameEngine.totalScore + "");
 
-		if (GameEngine.gameOver || Time.timeScale == 0) {
+		GUI.skin = guiSkin;
+		if (GameEngine.showGUI || Time.timeScale == 0) {
 			switch (menuPosition) {
 				case MenuState.MAIN:
 					int _width = 200;
-					if (GUI.Button (new Rect (0, originalHeight / 2 - 96, _width, 24), "Start")) {
+					int _height = 34;
+					int _startPosition = (int) (originalHeight / 2) - 120;
+					if (GUI.Button (new Rect (0, _startPosition, _width, _height), "Start")) {
 						if (GameEngine.gameOver)
 							gameEngine.GetComponent<GameEngine>().reset();
-						GameEngine.gameOver = false;
-						Time.timeScale = 1;
+						else {
+							Time.timeScale = 1;
+						}
 					}
-					if (GUI.Button (new Rect (0, originalHeight / 2 - 72, _width, 24), "Calibrate")) {
+					if (GUI.Button (new Rect (0, _startPosition + _height, _width, _height), "Calibrate")) {
 						calibratedRotation = new Vector2(Input.acceleration.x, Input.acceleration.y);
 					}
 
-					GUI.Label(new Rect (0, originalHeight / 2 - 45, _width, 24), "Max # of particles");
-					PlayerPrefs.SetInt ("maxParticles", (int) GUI.HorizontalSlider(new Rect (0, originalHeight / 2 - 24, _width, 24), PlayerPrefs.GetInt ("maxParticles"), 50, 2000));
+					GUI.Label(new Rect (0, _startPosition + (_height * 2), _width, _height), "Max # of particles");
+					PlayerPrefs.SetInt ("maxParticles", (int) GUI.HorizontalSlider(new Rect (0, _startPosition + (_height * 2) + 2, _width - 5, _height), PlayerPrefs.GetInt ("maxParticles"), 50, 2000));
 					GameEngine.maxParticleCount = PlayerPrefs.GetInt ("maxParticles");
 
-					if (GUI.Button (new Rect (0, originalHeight / 2, _width, 24), "Leaderboards")) {
+					if (GUI.Button (new Rect (0, _startPosition + (_height * 3), _width, _height), "Leaderboards")) {
 						// Social.ShowLeaderboardUI();
 						((PlayGamesPlatform) Social.Active).ShowLeaderboardUI("CgkIgpP17bANEAIQCQ");
 					}
-					if (GUI.Button (new Rect (0, originalHeight / 2 + 24, _width, 24), "Achievements")) {
+					if (GUI.Button (new Rect (0, _startPosition + (_height * 4), _width, _height), "Achievements")) {
 						Social.ShowAchievementsUI();
 					}
-					if (GUI.Button (new Rect (0, originalHeight / 2 + 48, _width, 24), "Support the Dev")) {
-						if (GameEngine.gameOver)
-							gameEngine.GetComponent<GameEngine>().reset();
-						GameEngine.gameOver = false;
-						Time.timeScale = 1;
-					}
+					// if (GUI.Button (new Rect (0, _startPosition + (_height * 5), _width, _height), "Support the Dev")) {
+					// 	if (GameEngine.gameOver)
+					// 		gameEngine.GetComponent<GameEngine>().reset();
+					// 	else {
+					// 		Time.timeScale = 1;
+					// 	}
+					// }
 
-					GUI.Label(new Rect(originalWidth - 50, originalHeight - 50, 45, 25), GameEngine.totalZombiesKilled + "");
+					GUI.skin = plainLabel;
+					GUI.Label(new Rect(originalWidth - 105, originalHeight - 30, 45, 25), "Score: ");
+					GUI.Label(new Rect(originalWidth - 205, originalHeight - 50, 150, 25), "Total Zombies Killed: ");
+					GUI.Label(new Rect(originalWidth - 60, originalHeight - 50, 45, 25), GameEngine.totalZombiesKilled + "");
 				break;
 			}
 		}

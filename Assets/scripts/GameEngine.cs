@@ -2,12 +2,14 @@
 using System.Collections;
 using GooglePlayGames;
 using UnityEngine.SocialPlatforms;
+using Holoville.HOTween;
 
 public class GameEngine : MonoBehaviour {
 	private Vector3 viewPos;
 	private readonly int FREQUENCYOFNEWCHARS = 30;
 	private int addNewCharacterCounter;
 	public static bool gameOver = true;
+	public static bool showGUI = true;
 	public static int totalScore = 0;
 	public static int totalZombiesKilled = 0;
 	public static Rect cameraViewSize;
@@ -107,7 +109,7 @@ public class GameEngine : MonoBehaviour {
 		_enemy.GetComponent<moveEnemy>().player = player;
 	}
 
-	public void reset() {
+	public void reset () {
 		GameObject[] objects = GameObject.FindGameObjectsWithTag("Enemy");
 		for (int i = 0; i < objects.Length; i++){
 			Destroy(objects[i]);
@@ -117,7 +119,25 @@ public class GameEngine : MonoBehaviour {
 			Destroy(objects2[i]);
 		}
 
-		totalScore = 0;
 		player = (GameObject) Instantiate(prefabPlayer);
+		totalScore = 0;
+
+		showGUI = false;
+		Time.timeScale = 0.4f;
+		HOTween.To(mainCamera.transform, 1, "position", new Vector3(0, 0, -10));
+		HOTween.To(mainCamera.transform, 1, "localRotation", Quaternion.Euler(0, 0, 0));
+		HOTween.To(mainCamera.camera, 1, new TweenParms().Prop("orthographicSize", 5).OnComplete(completeReset));
+
+		// mainCamera.transform.position = new Vector3(0, 0, -10);
+		// mainCamera.transform.localRotation = Quaternion.Euler(0, 0, 0);
+		// mainCamera.camera.orthographicSize = 5;
+		// player = (GameObject) Instantiate(prefabPlayer);
+		// Time.timeScale = 1f;
+		// gameOver = false;
+	}
+
+	private void completeReset () {
+		Time.timeScale = 1f;
+		gameOver = false;
 	}
 }
