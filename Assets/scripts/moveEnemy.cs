@@ -44,7 +44,7 @@ public class moveEnemy : MonoBehaviour {
 			addParticlesOnDeath();
 			// if (GameObject.FindGameObjectWithTag("Player").GetComponent<movePlayer>().health > 0)
 			// 	reset();
-			if (movePlayer.twoshotAlive > 0 || movePlayer.shotgunAlive > 0 && movePlayer.shieldAlive > 0)
+			if (movePlayer.twoshotAlive > 0 || movePlayer.shotgunAlive > 0 || movePlayer.shieldAlive > 0)
 				Destroy(gameObject);
 			else
 				reset();
@@ -54,7 +54,7 @@ public class moveEnemy : MonoBehaviour {
 			addPowerupsOnDeath();
 			GameEngine.totalZombiesKilled++;
     		GameEngine.totalScore += 100;
-			if (movePlayer.twoshotAlive > 0 || movePlayer.shotgunAlive > 0 && movePlayer.shieldAlive > 0)
+			if (movePlayer.twoshotAlive > 0 || movePlayer.shotgunAlive > 0 || movePlayer.shieldAlive > 0)
 				Destroy(gameObject);
 			else
 				reset();
@@ -62,7 +62,7 @@ public class moveEnemy : MonoBehaviour {
 	}
 
 	void addPowerupsOnDeath () {
-		int randomNumber = (int) (Random.value * 150);
+		int randomNumber = (int) (Random.value * 250);
 		// int randomNumber = (int) (Random.value * 2);
 		if(randomNumber == 1){
 			//add new powerup
@@ -70,32 +70,32 @@ public class moveEnemy : MonoBehaviour {
 			switch((int) (Random.value * 12)){
 				case 0: case 1:
 					_pu = (GameObject) Instantiate(prefabPowerupLaser);
-					_pu.transform.position = transform.position;
+					_pu.transform.position = new Vector3(transform.position.x, transform.position.y, -0.5f);
 					_pu.GetComponent<Powerup>().type = Powerup.PowerupType.LASER;
 					break;
 				case 2:
 					_pu = (GameObject) Instantiate(prefabPowerupNuke);
-					_pu.transform.position = transform.position;
+					_pu.transform.position = new Vector3(transform.position.x, transform.position.y, -0.5f);
 					_pu.GetComponent<Powerup>().type = Powerup.PowerupType.NUKE;
 					break;
 				case 3: case 4: case 5: case 6:
 					_pu = (GameObject) Instantiate(prefabPowerup2shot);
-					_pu.transform.position = transform.position;
+					_pu.transform.position = new Vector3(transform.position.x, transform.position.y, -0.5f);
 					_pu.GetComponent<Powerup>().type = Powerup.PowerupType.TWOSHOT;
 					break;
 				case 7: case 8: case 9:
 					_pu = (GameObject) Instantiate(prefabPowerupShotgun);
-					_pu.transform.position = transform.position;
+					_pu.transform.position = new Vector3(transform.position.x, transform.position.y, -0.5f);
 					_pu.GetComponent<Powerup>().type = Powerup.PowerupType.SHOTGUN;
 					break;
 				case 10:
 					_pu = (GameObject) Instantiate(prefabPowerupHealth);
-					_pu.transform.position = transform.position;
+					_pu.transform.position = new Vector3(transform.position.x, transform.position.y, -0.5f);
 					_pu.GetComponent<Powerup>().type = Powerup.PowerupType.HEALTH;
 					break;
 				case 11:
 					_pu = (GameObject) Instantiate(prefabPowerupShield);
-					_pu.transform.position = transform.position;
+					_pu.transform.position = new Vector3(transform.position.x, transform.position.y, -0.5f);
 					_pu.GetComponent<Powerup>().type = Powerup.PowerupType.SHIELD;
 					break;
 			}
@@ -107,7 +107,7 @@ public class moveEnemy : MonoBehaviour {
 		for(int k = 0; k < numOfParts;k++){
 			if(GameEngine.particleCount < GameEngine.maxParticleCount) {
 				GameObject _part = (GameObject) Instantiate(prefabParticle);
-				_part.transform.position = new Vector3(transform.position.x, transform.position.y, 1);
+				_part.transform.position = new Vector3(transform.position.x, transform.position.y, Random.value + 0.5f);
 				GameEngine.particleCount++;
 			}
 		}

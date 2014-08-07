@@ -31,7 +31,7 @@ public class Powerup : MonoBehaviour {
 		if (!GameEngine.gameOver) {
 			if(smokeCounter >= 4){
 				GameObject _part = (GameObject) Instantiate(prefabParticle);
-				_part.transform.position = new Vector3(transform.position.x, transform.position.y, 1);
+				_part.transform.position = new Vector3(transform.position.x, transform.position.y, Random.value + 0.5f);
 				_part.GetComponent<moveParticle>().changeType(moveParticle.pType.POWERUPDUST);
 				GameEngine.particleCount++;
 				smokeCounter = 0;
@@ -67,7 +67,7 @@ public class Powerup : MonoBehaviour {
 				for(int k = 0; k < numOfParts;k++){
 					if(GameEngine.particleCount < GameEngine.maxParticleCount) {
 						GameObject _part = (GameObject) Instantiate(prefabParticle);
-						_part.transform.position = new Vector3(transform.position.x, transform.position.y, 1);
+						_part.transform.position = new Vector3(transform.position.x, transform.position.y, Random.value + 0.5f);
 						_part.GetComponent<moveParticle>().vel = Random.value * 5 + 13;
 						GameEngine.particleCount++;
 					}
@@ -84,7 +84,7 @@ public class Powerup : MonoBehaviour {
 			for(int k = 0; k < nop;k++){
 				if(GameEngine.particleCount < GameEngine.maxParticleCount) {
 					GameObject _part = (GameObject) Instantiate(prefabParticle);
-					_part.transform.position = new Vector3(transform.position.x, transform.position.y, 1);
+					_part.transform.position = new Vector3(transform.position.x, transform.position.y, Random.value + 0.5f);
 					_part.GetComponent<moveParticle>().vel = Random.value * 5 + 3;
 					GameEngine.particleCount++;
 				}

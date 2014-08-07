@@ -47,6 +47,8 @@ public class moveParticle : MonoBehaviour {
 
 		transform.localScale = new Vector3(diameter / 5f, diameter / 5f, diameter / 5f);
 		// transform.localScale = new Vector3(0.1f,0.1f,0.1f);
+
+		transform.position = new Vector3(transform.position.x, transform.position.y, Random.value + 0.5f);
 	}
 
 	public void changeType (pType type) {
@@ -152,7 +154,7 @@ public class moveParticle : MonoBehaviour {
 		else{
 			float _dX = (Mathf.Cos(dir) * vel / 100);
 			float _dY = (Mathf.Sin(dir) * vel / 100);
-			transform.position = new Vector3(transform.position.x + _dX, transform.position.y + _dY, 1);
+			transform.position = new Vector3(transform.position.x + _dX, transform.position.y + _dY, transform.position.z);
 			dir += Random.value * 0.6f - 0.3f;
 			vel *= 0.99f;
 			if(opacity - 1 > 0){

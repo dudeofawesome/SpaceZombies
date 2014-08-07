@@ -13,7 +13,6 @@ public class movePlayer : MonoBehaviour {
 	private float diameter = 0.5f;
 	public GameObject gameEngine = null;
 	private int smokeCounter = 0;
-	// public static Laser laser = new Laser(-10,-10,-11,-11);
 	public static readonly int twoshotLife = 200;
 	public static int twoshotAlive = 0;
 	public static readonly int shotgunLife = 200;
@@ -38,20 +37,14 @@ public class movePlayer : MonoBehaviour {
 
 	void FixedUpdate () {
 		if (!GameEngine.gameOver) {
-//			Vector3 diff = Camera.main.ScreenToWorldPoint(new Vector2(((Input.acceleration.x - gameGUI.calibratedRotation.x) * 10000) - Screen.width, ((Input.acceleration.y - gameGUI.calibratedRotation.y) * 10000) - Screen.height));// - transform.position;
-			Vector3 diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
-			print(Screen.height);
+			Vector3 diff = Camera.main.ScreenToWorldPoint(new Vector2(((Input.acceleration.x - gameGUI.calibratedRotation.x) * 10000) - Screen.width, ((Input.acceleration.y - gameGUI.calibratedRotation.y) * 10000) - Screen.height));
+			if (Application.isEditor)
+				diff = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
 	        diff.Normalize();
 	        float rot_z = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg;
 	        transform.rotation = Quaternion.Euler(0f, 0f, rot_z);
 
-	        // transform.position = new Vector3(Mathf.Cos(rot_z) / 100 + transform.position.x, Mathf.Sin(rot_z) / 100 + transform.position.y, 0);
 	        transform.Translate(new Vector3(velocity / 80f, 0f, 0f));
-
-
-
-			// transform.LookAt (new Vector3((Input.acceleration.x - gameGUI.calibratedRotation.x) * 1000, (Input.acceleration.y - gameGUI.calibratedRotation.y) * 1000, 0));
-			// transform.position = new Vector3 ((float)(transform.position.x + transform.forward.x * 0.01f * velocity), (float)(transform.position.y + transform.forward.y * 0.01f * velocity), 0);
 
 			if (bulletThisFrame == 0) {
 				shootBullet();
@@ -61,33 +54,33 @@ public class movePlayer : MonoBehaviour {
 
 			if(smokeCounter >= 4){
 				GameObject _part = (GameObject) Instantiate(prefabParticle);
-				_part.transform.position = new Vector3(transform.position.x, transform.position.y, 1);
+				_part.transform.position = new Vector3(transform.position.x, transform.position.y, Random.value + 0.5f);
 				_part.GetComponent<moveParticle>().changeType(moveParticle.pType.EXHAUST);
 				GameEngine.particleCount++;
 
 				if(health <= 75){
 					_part = (GameObject) Instantiate(prefabParticle);
-					_part.transform.position = new Vector3(transform.position.x, transform.position.y, 1);
+					_part.transform.position = new Vector3(transform.position.x, transform.position.y, Random.value + 0.5f);
 					_part.GetComponent<moveParticle>().changeType(moveParticle.pType.SMOKE);
 					GameEngine.particleCount++;
 				}
 				if(health <= 50){
 					_part = (GameObject) Instantiate(prefabParticle);
-					_part.transform.position = new Vector3(transform.position.x, transform.position.y, 1);
+					_part.transform.position = new Vector3(transform.position.x, transform.position.y, Random.value + 0.5f);
 					_part.GetComponent<moveParticle>().changeType(moveParticle.pType.SMOKE);
 					GameEngine.particleCount++;
 					_part = (GameObject) Instantiate(prefabParticle);
-					_part.transform.position = new Vector3(transform.position.x, transform.position.y, 1);
+					_part.transform.position = new Vector3(transform.position.x, transform.position.y, Random.value + 0.5f);
 					_part.GetComponent<moveParticle>().changeType(moveParticle.pType.SMOKE);
 					GameEngine.particleCount++;
 				}
 				if(health <= 25){
 					_part = (GameObject) Instantiate(prefabParticle);
-					_part.transform.position = new Vector3(transform.position.x, transform.position.y, 1);
+					_part.transform.position = new Vector3(transform.position.x, transform.position.y, Random.value + 0.5f);
 					_part.GetComponent<moveParticle>().changeType(moveParticle.pType.FIRE);
 					GameEngine.particleCount++;
 					_part = (GameObject) Instantiate(prefabParticle);
-					_part.transform.position = new Vector3(transform.position.x, transform.position.y, 1);
+					_part.transform.position = new Vector3(transform.position.x, transform.position.y, Random.value + 0.5f);
 					_part.GetComponent<moveParticle>().changeType(moveParticle.pType.FIRE);
 					GameEngine.particleCount++;
 				}
@@ -120,7 +113,7 @@ public class movePlayer : MonoBehaviour {
 	private void endGame () {
 		Time.timeScale = 0.4f;
 		HOTween.To(gameEngine.GetComponent<GameEngine>().mainCamera.transform, 3, "position", new Vector3(transform.position.x, transform.position.y, -10));
-		HOTween.To(gameEngine.GetComponent<GameEngine>().mainCamera.transform, 3, "localRotation", Quaternion.Euler(0, 0, 30));
+		HOTween.To(gameEngine.GetComponent<GameEngine>().mainCamera.transform, 3, "localRotation", Quaternion.Euler(355, 3, 30));
 		HOTween.To(gameEngine.GetComponent<GameEngine>().mainCamera.camera, 3, new TweenParms().Prop("orthographicSize", 2).OnComplete(completeEndGame));
 
 		PlayerPrefs.SetInt ("totalZombiesKilled", GameEngine.totalZombiesKilled);
@@ -130,7 +123,7 @@ public class movePlayer : MonoBehaviour {
 			if(GameEngine.particleCount > GameEngine.maxParticleCount)
 				break;
 			GameObject _part = (GameObject) Instantiate(prefabParticle);
-			_part.transform.position = new Vector3(transform.position.x, transform.position.y, 1);
+			_part.transform.position = new Vector3(transform.position.x, transform.position.y, Random.value + 0.5f);
 			_part.GetComponent<moveParticle>().vel = Random.value * 5 + 6;
 			GameEngine.particleCount++;
 		}
@@ -201,10 +194,8 @@ public class movePlayer : MonoBehaviour {
 		
 		for(int i = 0;i < collectedPowerups.Count;i++){
 			if(collectedPowerups[i] == Powerup.PowerupType.LASER){
-				// laserShooting = true;
 				laserAlive = laserLife;
 				transform.Find("Laser").active = true;
-				// gameObject.GetComponent<BoxCollider2D>().enabled = true;
 				collectedPowerups.Remove(Powerup.PowerupType.LASER);
 			}
 			else if(collectedPowerups[i] == Powerup.PowerupType.TWOSHOT){
@@ -238,8 +229,6 @@ public class movePlayer : MonoBehaviour {
 		}
 		else if (laserAlive == 0) {
 			transform.Find("Laser").active = false;
-			print("laser off");
-			// gameObject.GetComponent<BoxCollider2D>().enabled = false;
 			laserAlive = -1;
 		}
 		else{
@@ -253,15 +242,15 @@ public class movePlayer : MonoBehaviour {
 			if(twoshot){
 				GameObject _bullet2 = (GameObject) Instantiate (prefabBullet);
 				_bullet2.transform.position = new Vector3(transform.position.x,transform.position.y,0);
-				_bullet2.transform.LookAt (new Vector3((Input.acceleration.x - gameGUI.calibratedRotation.x) * -1000, (Input.acceleration.y - gameGUI.calibratedRotation.y) * -1000, 0));
+				_bullet2.transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(0, 0, 180));
 			}
 			if(shotgun){
 				for(int i = -2;i <= 2;i++){
 					if (i != 0) {
 						GameObject _bullet2 = (GameObject) Instantiate (prefabBullet);
 						_bullet2.transform.position = new Vector3(transform.position.x,transform.position.y,0);
-						float _angleTo = Mathf.Atan2((Input.acceleration.y - gameGUI.calibratedRotation.y), (Input.acceleration.x - gameGUI.calibratedRotation.x)) + ((float) i / 5);
-						_bullet2.transform.LookAt (new Vector3(Mathf.Cos(_angleTo) * 1000, Mathf.Sin(_angleTo) * 1000, 0));
+						float _angleTo = (float) (i * 15);
+						_bullet2.transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(0, 0, _angleTo));
 					}
 				}
 			}

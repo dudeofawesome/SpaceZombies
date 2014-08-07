@@ -2,6 +2,7 @@
 using System.Collections;
 using GooglePlayGames;
 using UnityEngine.SocialPlatforms;
+using Holoville.HOTween;
 
 public class gameGUI : MonoBehaviour {
 	public enum MenuState {
@@ -33,12 +34,24 @@ public class gameGUI : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKeyDown(KeyCode.Escape)) {
-			if (Time.timeScale == 1)
+		if (Input.GetKeyDown(KeyCode.Escape) && !GameEngine.gameOver) {
+			if (Time.timeScale == 1) {
 				Time.timeScale = 0;
-			else
-				Time.timeScale = 1;
+				HOTween.To(gameEngine.GetComponent<GameEngine>().mainCamera.transform, 1, new TweenParms().Prop("position", new Vector3(-1.77f, -1.98f, -10f)).UpdateType(UpdateType.TimeScaleIndependentUpdate));
+				HOTween.To(gameEngine.GetComponent<GameEngine>().mainCamera.transform, 1, new TweenParms().Prop("localRotation", Quaternion.Euler(346.5201f, 8.390002f, 0f)).UpdateType(UpdateType.TimeScaleIndependentUpdate));
+				HOTween.To(gameEngine.GetComponent<GameEngine>().mainCamera.camera, 1, new TweenParms().Prop("orthographicSize", 3.8f).UpdateType(UpdateType.TimeScaleIndependentUpdate));
+			}
+			else {
+				// Time.timeScale = 1;
+				HOTween.To(gameEngine.GetComponent<GameEngine>().mainCamera.transform, 1, new TweenParms().Prop("position", new Vector3(0, 0, -10)).UpdateType(UpdateType.TimeScaleIndependentUpdate));
+				HOTween.To(gameEngine.GetComponent<GameEngine>().mainCamera.transform, 1, new TweenParms().Prop("localRotation", Quaternion.Euler(0, 0, 0)).UpdateType(UpdateType.TimeScaleIndependentUpdate));
+				HOTween.To(gameEngine.GetComponent<GameEngine>().mainCamera.camera, 1, new TweenParms().Prop("orthographicSize", 5).UpdateType(UpdateType.TimeScaleIndependentUpdate).OnComplete(completePause));
+			}
 		}
+	}
+
+	void completePause () {
+		Time.timeScale = 1;
 	}
 
 	void OnGUI () {
@@ -51,7 +64,7 @@ public class gameGUI : MonoBehaviour {
 		var svMat = GUI.matrix; // save current matrix
 		GUI.matrix = Matrix4x4.TRS (Vector3.zero, Quaternion.identity, scale);
 
-		GUI.Label(new Rect(originalWidth - 60, originalHeight - 30, 45, 25), GameEngine.totalScore + "");
+		GUI.Label(new Rect(originalWidth - 60, originalHeight - 30, 70, 25), GameEngine.totalScore + "");
 
 		GUI.skin = guiSkin;
 		if (GameEngine.showGUI || Time.timeScale == 0) {
@@ -64,7 +77,9 @@ public class gameGUI : MonoBehaviour {
 						if (GameEngine.gameOver)
 							gameEngine.GetComponent<GameEngine>().reset();
 						else {
-							Time.timeScale = 1;
+							HOTween.To(gameEngine.GetComponent<GameEngine>().mainCamera.transform, 1, new TweenParms().Prop("position", new Vector3(0, 0, -10)).UpdateType(UpdateType.TimeScaleIndependentUpdate));
+							HOTween.To(gameEngine.GetComponent<GameEngine>().mainCamera.transform, 1, new TweenParms().Prop("localRotation", Quaternion.Euler(0, 0, 0)).UpdateType(UpdateType.TimeScaleIndependentUpdate));
+							HOTween.To(gameEngine.GetComponent<GameEngine>().mainCamera.camera, 1, new TweenParms().Prop("orthographicSize", 5).UpdateType(UpdateType.TimeScaleIndependentUpdate).OnComplete(completePause));
 						}
 					}
 					if (GUI.Button (new Rect (0, _startPosition + _height, _width, _height), "Calibrate")) {
